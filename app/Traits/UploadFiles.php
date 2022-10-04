@@ -45,4 +45,39 @@ trait UploadFiles
         }
     }
 
+    // store new file base64
+    public static function storeFileBase64($file, $storagePath)
+    {
+
+        $image_parts = explode(";base64,", $file);
+        $image_type = explode("image/", $image_parts[0])[1];
+        $image_base64 = base64_decode($image_parts[1]);
+        $file_name = uniqid() . '.' . $image_type;
+        $path = $storagePath . $file_name;
+
+        file_put_contents(public_path($path), $image_base64);
+
+        $fileInformation = [
+            'file_name' => $file_name,
+            'path' => $path,
+            'file_extension' => $image_type,
+        ];
+
+        return $fileInformation;
+    }
+
+    // update existing file
+    public static function updateFileBase64($file, $storagePath, $oldFilePath)
+    {
+        UploadFiles::removeFileBase64($oldFilePath);
+        return UploadFiles::storeFileBase64($file, $storagePath);
+    }
+
+    // remove existing file
+    public static function removeFileBase64($oldFilePath)
+    {
+        if (File::exists(public_path($oldFilePath))) {
+            @unlink(public_path($oldFilePath));
+        }
+    }
 }

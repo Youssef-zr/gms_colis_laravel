@@ -4,16 +4,19 @@ namespace App\Http\Controllers\backend;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\bandel\crudBandleRequest;
-use App\Http\Requests\users\crudUserRequest;
 use App\Models\Bundel;
 use App\Models\City;
 use App\Models\Note;
 use App\Models\Status;
+use App\Traits\bundelsCache;
+use App\Traits\UploadFiles;
 use App\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 
 class BundleController extends Controller
 {
+    use bundelsCache, UploadFiles;
     /**
      * Display a listing of the resource.
      *
@@ -22,9 +25,11 @@ class BundleController extends Controller
     public function index()
     {
         $title = "colis";
-        $bundels = Bundel::with(["expediteur:id,name", "livreur:id,name"])->get();
+        $livreurs = User::where('role_name', "livreur")->pluck('name', "id")->toArray();
+        $statuts = Status::pluck('libelle', "id")->toArray();
+        $bundelsData = bundelsCache::getBundelsCache();
 
-        return view("backend.views.bundels.index", compact("title", "bundels"));
+        return view("backend.views.bundels.index", compact("title", "bundelsData", "statuts", "livreurs"));
     }
 
     /**
@@ -35,7 +40,6 @@ class BundleController extends Controller
     public function create()
     {
         $title = "Nouveau colis";
-
         $expediteurs = User::where('role_name', "expediteur")->pluck('name', "id")->toArray();
         $statuts = Status::pluck('libelle', "id")->toArray();
         $villes = City::pluck('libelle', "id")->toArray();
@@ -55,6 +59,7 @@ class BundleController extends Controller
         $data = $request->all();
         $new = new Bundel();
         $new->fill($data)->save();
+        bundelsCache::removeBundelsCache(true);
 
         return redirect_with_flash("msgSuccess", "colis créé avec succès", "bundels");
     }
@@ -79,7 +84,6 @@ class BundleController extends Controller
     public function edit(Bundel $bundel)
     {
         $title = "Editer colis";
-
         $expediteurs = User::where('role_name', "expediteur")->pluck('name', "id")->toArray();
         $statuts = Status::pluck('libelle', "id")->toArray();
         $villes = City::pluck('libelle', "id")->toArray();
@@ -99,6 +103,7 @@ class BundleController extends Controller
     {
         $data = $request->all();
         $bundel->fill($data)->save();
+        bundelsCache::removeBundelsCache();
 
         return redirect_with_flash("msgSuccess", "colis mis à jour avec succès", "bundels");
     }
@@ -111,6 +116,66 @@ class BundleController extends Controller
      */
     public function destroy(Bundel $bundel)
     {
-        //
+        UploadFiles::removeFileBase64($bundel->signature);
+
+        $bundel->delete();
+        bundelsCache::removeBundelsCache(true);
+
+        return redirect_with_flash("msgSuccess", "colis supprimer avec succès", "bundels");
+    }
+
+    // delivery staff
+    public function updateBundleDelivery(Request $request)
+    {
+        $data = Arr::except($request->all(), ['example_length', "colis"]);
+        $bundels = $request->colis;
+
+        if ($bundels > 0) {
+            foreach ($bundels as $bundel) {
+                $findBundel = Bundel::find($bundel);
+
+                if ($findBundel != null) {
+                    $data['date'] != null ? $findBundel->date = $data['date'] : null;
+                    $data['id_livreur'] != null ? $findBundel->id_livreur = $data['id_livreur'] : null;
+                    $data['id_statut'] != null ? $findBundel->id_statut = $data['id_statut'] : null;
+
+                    $findBundel->save();
+                }
+            }
+            bundelsCache::removeBundelsCache();
+        }
+
+        return redirect_with_flash("msgSuccess", "informations mises à jour avec succès", "bundels");
+    }
+
+    // get bundel signature form
+    public function getBundelSignature($bundel_id)
+    {
+        $bundel = Bundel::find($bundel_id);
+        if ($bundel == null) {
+            return redirect_to_404_if_emty($bundel);
+        }
+
+        $title = "colis signature";
+
+        $oldSignature = '';
+        if ($bundel->signature != "" and file_exists(public_path($bundel->signature))) {
+            $oldSignature = $bundel->signature;
+        }
+
+        return view('backend.views.bundels.signature.signature-form', compact('bundel_id', "title", "oldSignature"));
+    }
+
+    // update bundel signature
+    public function updateBundelSignature(Request $request)
+    {
+        $bundel = Bundel::find($request->bundel_id);
+
+        $storagePath = 'assets/dist/storage/signatures/'; // create signatures folder in public directory
+        $fileinformation = UploadFiles::updateFileBase64($request->signed, $storagePath, $bundel->signature);
+
+        $bundel->fill(['signature' => $fileinformation['path']])->save();
+
+        return redirect_with_flash("msgSuccess", "La signature a été enregistrée avec succès", "bundels");
     }
 }

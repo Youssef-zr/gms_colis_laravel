@@ -87,7 +87,7 @@
         </div>
     </div>
  {{-- Code Destinataire --}}
- <div class="col-12 col-md-4">
+ <div class="col-12 col-md-4 col-lg-3">
     <div class="form-group {{ $errors->has('code_destinataire') ? 'has-error' : '' }}">
         <div class="option">
             {!! Form::label('code_destinataire', 'Code Destinataire', ['class' => 'form-label']) !!}
@@ -106,7 +106,7 @@
     </div>
 </div>
     {{-- Nom --}}
-    <div class="col-12 col-md-4">
+    <div class="col-12 col-md-4 col-lg-3">
         <div class="form-group {{ $errors->has('nom_destinataire') ? 'has-error' : '' }}">
             <div class="option">
                 {!! Form::label('nom_destinataire', 'Nom destinataire', ['class' => 'form-label']) !!}
@@ -126,7 +126,7 @@
     </div>
 
     {{-- Adresse Destinataire --}}
-    <div class="col-12 col-md-4">
+    <div class="col-12 col-md-4 col-lg-3">
         <div class="form-group {{ $errors->has('adresse_destinataire') ? 'has-error' : '' }}">
             <div class="option">
                 {!! Form::label('adresse_destinataire', 'Adresse destinataire', ['class' => 'form-label']) !!}
@@ -146,7 +146,7 @@
     </div>
 
     {{-- Tel  --}}
-    <div class="col-12 col-md-4">
+    <div class="col-12 col-md-4 col-lg-3">
         <div class="form-group {{ $errors->has('tel') ? 'has-error' : '' }}">
             <div class="option">
                 {!! Form::label('tel', 'Tél destinataire', ['class' => 'form-label']) !!}

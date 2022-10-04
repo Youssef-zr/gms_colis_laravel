@@ -38,7 +38,7 @@ Route::group(['prefix' => "dashboard", "middleware" => ['auth'], 'namespace' => 
 
     // dashboard routes
     Route::get('/', 'DashboardController@welcome');
-    route::get('/logout',"DashboardController@logout");
+    route::get('/logout', "DashboardController@logout");
 
     //cities rotes
     Route::resource('/cities', "CityController");
@@ -51,7 +51,10 @@ Route::group(['prefix' => "dashboard", "middleware" => ['auth'], 'namespace' => 
 
     //notes rotes
     Route::resource('/bundels', "BundleController");
-    
+    Route::patch('/bundelsUpdateDelivery', "BundleController@updateBundleDelivery")->name('staff.updateDelivery');
+    Route::get('/bundels/signature/{bundel_id}', "BundleController@getBundelSignature")->name('bundel.signature.show');
+    Route::patch('/bundels/signature/{bundel_id}', "BundleController@updateBundelSignature")->name('bundel.signature.update');
+
     // users resource
     Route::resource('/users', "UserController");
     Route::get('user/profile', "UserController@editProfile")->name('user.edit_profile');

@@ -14,8 +14,9 @@ class UserTableSeeder extends Seeder
      */
     public function run()
     {
-
+        // -----------------------------------------
         // "developpeur" role
+        // -----------------------------------------
         $developer = User::create([
             'name' => 'omag dev',
             'email' => 'omag@dev.com',
@@ -31,7 +32,9 @@ class UserTableSeeder extends Seeder
         $role->revokePermissionTo("tableau_bord_index");
         $developer->assignRole([$role->id]);
 
+        // -----------------------------------------
         // "admin" role
+        // -----------------------------------------
         $admin = User::create([
             'name' => 'ayoub',
             'email' => 'e.ayoub@mondialservice.ma',
@@ -74,14 +77,52 @@ class UserTableSeeder extends Seeder
             // "tableau_bord_index",
         ];
 
-        $roleAdmin = Role::create(['name' => 'expediteur']);
-        $roleAdmin->syncPermissions($expiditeurPermission);
+        $roleExpediteur = Role::create(['name' => 'expediteur']);
+        $roleExpediteur->syncPermissions($expiditeurPermission);
 
         foreach ($ExpediteursUsers as $expediteur) {
 
-            $newAdmin = new User();
-            $newAdmin->fill($expediteur)->save();
-            $newAdmin->assignRole([$roleAdmin->id]);
+            $newExpediteur = new User();
+            $newExpediteur->fill($expediteur)->save();
+            $newExpediteur->assignRole([$roleExpediteur->id]);
+        }
+
+        // -----------------------------------------
+        //    "livreurs" role
+        // -----------------------------------------
+        $LivreursUsers = [
+            [
+                'name' => 'jamal',
+                'email' => 'livreur1@app.com',
+                'phone' => '0600000023',
+                'password' => bcrypt('123456'),
+                "status" => 'activé',
+                "role_name" => 'livreur',
+
+            ],
+            [
+                'name' => 'tarek',
+                'email' => 'livreur2@app.com',
+                'phone' => '0700000078',
+                'password' => bcrypt('123456'),
+                "status" => 'activé',
+                "role_name" => 'livreur',
+
+            ],
+        ];
+
+        $LivreursPermissions = [
+            // "tableau_bord_index",
+        ];
+
+        $roleLivreur = Role::create(['name' => 'livreur']);
+        $roleLivreur->syncPermissions($LivreursPermissions);
+
+        foreach ($LivreursUsers as $livreur) {
+
+            $newLivreur = new User();
+            $newLivreur->fill($livreur)->save();
+            $newLivreur->assignRole([$roleLivreur->id]);
         }
 
     }

@@ -17,6 +17,19 @@
         div.dataTables_wrapper {
             margin: 15px auto 0;
         }
+
+        tbody tr td {
+            position: relative;
+        }
+
+        .user-photo {
+            width: 60px;
+            height: 60px;
+            position: absolute;
+            top:3px;
+            left:20px;
+            border-radius: 50%
+        }
     </style>
 @endpush
 
@@ -69,6 +82,7 @@
                                                 <thead>
                                                     <tr>
                                                         <th>#</th>
+                                                        <th>photo</th>
                                                         <th>nom</th>
                                                         <th>email</th>
                                                         <th>statut</th>
@@ -85,6 +99,8 @@
                                                     @foreach ($users as $user)
                                                         <tr>
                                                             <td> {{ $i }} </td>
+                                                            <td> <img src="{{ url($user->path) }}" alt="{{ $user->path }}"
+                                                                    class="user-photo"> </td>
                                                             <td> {{ $user->name }} </td>
                                                             <td> {{ $user->email }} </td>
                                                             <td>

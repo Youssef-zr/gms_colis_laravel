@@ -30,14 +30,14 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1><i class="fa fa-map-marker"></i> {{ $title }}</h1>
+                    <h1><i class="fa fa-shopping-basket"></i> {{ $title }}</h1>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
                         <li class="breadcrumb-item">
-                            <a href="{{ adminurl('clients') }}">
-                                <i class="fa fa-map"></i>
-                                villes
+                            <a href="{{ adminurl('bundels') }}">
+                                <i class="fa fa-shopping-basket"></i>
+                                list colis
                             </a>
                         </li>
                         <li class="breadcrumb-item active"><i class="fa fa-pencil-square"></i> {{ $title }}</li>
