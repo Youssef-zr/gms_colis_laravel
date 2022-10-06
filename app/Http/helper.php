@@ -345,3 +345,22 @@ if (!function_exists('type_paiment')) {
         return $type_paiment;
     }
 }
+
+// sync on off
+if (!function_exists('bundel_status')) {
+    function bundel_status($status)
+    {
+        $bundel_status = [
+            'livré' => "bg-success",
+            'en attente' => "bg-warning",
+            'annulé' => "bg-danger",
+            'retourné' => "bg-info",
+        ];
+        if (in_array($status, ['livré', "en attente", "annulé", "retourné"])) {
+
+            return $bundel_status[$status];
+        }
+
+        return "bg-secondary";
+    }
+}

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\bandel;
+namespace App\Http\Requests\bundel;
 
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -36,12 +36,13 @@ class crudBandleRequest extends FormRequest
             "id_ville" => "required|nullable",
             "id_remarques" => "sometimes|nullable",
             "montant" => 'required|numeric',
+            "type_paiement" => 'required',
         ];
 
         $method = strtolower(request()->method());
         if ($method == "patch") {
-            $rules["numero_commande"] = "required|numeric|unique:colis,numero_commande," . $this->bundel->id;
-            $rules["numero_suivi"] = "required|numeric|unique:colis,numero_suivi," . $this->bundel->id;
+            $rules["numero_commande"] = "required|alpha_num|unique:colis,numero_commande," . $this->bundel->id;
+            $rules["numero_suivi"] = "required|alpha_num|unique:colis,numero_suivi," . $this->bundel->id;
         }
         return $rules;
 

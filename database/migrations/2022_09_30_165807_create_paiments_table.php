@@ -16,14 +16,14 @@ class CreatePaimentsTable extends Migration
         Schema::create('paiments', function (Blueprint $table) {
             $table->id();
             $table->date('date')->nullable();
-            $table->string('reference');
+            $table->longText('recu_paiment')->nullable()->default('--');
             $table->integer('montant')->nullable()->default(0);
-            $table->timestamp("heure");
+            $table->string("heure");
 
-            $table->unsignedBigInteger('id_utilisateur')->nullable();
-            $table->foreign('id_utilisateur')->references('id')->on('users')->onDelete('set null');
-            $table->unsignedBigInteger('id_Expediteur')->nullable();
-            $table->foreign('id_Expediteur')->references('id')->on('users')->onDelete('set null');
+            $table->unsignedBigInteger('id_livreur')->nullable();
+            $table->foreign('id_livreur')->references('id')->on('users')->onDelete('set null');
+            $table->unsignedBigInteger('id_expediteur')->nullable();
+            $table->foreign('id_expediteur')->references('id')->on('users')->onDelete('set null');
             $table->timestamps();
         });
     }

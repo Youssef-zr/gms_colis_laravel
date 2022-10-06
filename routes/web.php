@@ -1,6 +1,9 @@
 <?php
 
+use App\Models\Bundel;
 use App\Models\City;
+use App\Models\Lpaiment;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -40,20 +43,25 @@ Route::group(['prefix' => "dashboard", "middleware" => ['auth'], 'namespace' => 
     Route::get('/', 'DashboardController@welcome');
     route::get('/logout', "DashboardController@logout");
 
-    //cities rotes
+    // cities rotes
     Route::resource('/cities', "CityController");
 
-    //statuses rotes
+    // statuses rotes
     Route::resource('/statuses', "statusController");
 
-    //notes rotes
+    // notes rotes
     Route::resource('/notes', "NoteController");
 
-    //notes rotes
+    // bundels (colis) rotes
     Route::resource('/bundels', "BundleController");
     Route::patch('/bundelsUpdateDelivery', "BundleController@updateBundleDelivery")->name('staff.updateDelivery');
-    Route::get('/bundels/signature/{bundel_id}', "BundleController@getBundelSignature")->name('bundel.signature.show');
-    Route::patch('/bundels/signature/{bundel_id}', "BundleController@updateBundelSignature")->name('bundel.signature.update');
+    Route::get('/bundels/signature/{bundel_id}', "BundleController@getBundelSignatureReceipt")->name('bundel.signature.show');
+    Route::patch('/bundels/signature/{bundel_id}', "BundleController@updateBundelSignatureReceipt")->name('bundel.signature.update');
+
+    // payments routes
+    Route::resource('/payments', "PaymentController");
+    // get bundels not payed for selected (expediteur and livreur)
+    Route::get('/bundels_status/payments', "PaymentController@getBundelsNotPaid")->name('payments.colis_not_paid');
 
     // users resource
     Route::resource('/users', "UserController");
@@ -86,6 +94,21 @@ Route::group(['prefix' => "dashboard", "middleware" => ['auth'], 'namespace' => 
 // });
 
 Route::get('/test', function () {
+
+    $payment = Lpaiment::where('id_paiement', 2)->pluck('id_colis')->toArray();
+
+    $bundelsAmount = Bundel::whereIn("id", $payment)->pluck('montant')->toArray();
+    $collection = new Collection($bundelsAmount);
+
+    dd($collection->sum());
+
+    $old = [1, 5, 15, 28, 63];
+    $new = [1, 18, 15, 63, 47, 11];
+
+    $updatedAndRemoved = array_diff($old, $new);
+    $inserted = array_diff($new, $old);
+
+    dd($updatedAndRemoved, $inserted);
 
     $path = public_path("assets/dist/js/cities.json");
     $cities = json_decode(file_get_contents($path), true);

@@ -48,7 +48,6 @@ trait UploadFiles
     // store new file base64
     public static function storeFileBase64($file, $storagePath)
     {
-
         $image_parts = explode(";base64,", $file);
         $image_type = explode("image/", $image_parts[0])[1];
         $image_base64 = base64_decode($image_parts[1]);
@@ -66,18 +65,20 @@ trait UploadFiles
         return $fileInformation;
     }
 
-    // update existing file
+    // update existing file base64
     public static function updateFileBase64($file, $storagePath, $oldFilePath)
     {
-        UploadFiles::removeFileBase64($oldFilePath);
+        UploadFiles::removeFile($oldFilePath);
         return UploadFiles::storeFileBase64($file, $storagePath);
     }
 
-    // remove existing file
-    public static function removeFileBase64($oldFilePath)
+    // convert image to base 64
+    public static function fileTo64bit($file)
     {
-        if (File::exists(public_path($oldFilePath))) {
-            @unlink(public_path($oldFilePath));
-        }
+        $file_type = $file->extension();
+        $base64 = "data:image/" . $file_type . ";base64," . base64_encode(file_get_contents($file));
+
+        return $base64;
     }
+
 }

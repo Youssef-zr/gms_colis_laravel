@@ -11,7 +11,7 @@ class Bundel extends Model
 {
 
     protected $table = "colis";
-    protected $guarded = [];
+    protected $guarded = ["count_mony"];
     /**
      * Get the user associated with the Bundel
      *
@@ -50,5 +50,10 @@ class Bundel extends Model
     public function statut()
     {
         return $this->hasOne(Status::class, 'id', 'id_statut');
+    }
+
+    public function getCountMonyAttribute()
+    {
+        return count(array_filter($this->montant));
     }
 }

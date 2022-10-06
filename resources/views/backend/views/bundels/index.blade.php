@@ -182,23 +182,34 @@
                                                                 <td>{{ $bundel->numero_suivi }}</td>
                                                                 <td>
                                                                     @if ($bundel->expediteur->name != null)
-                                                                        {{ $bundel->expediteur->name }}
+                                                                        <label class="badge badge-primary">
+                                                                            {{ $bundel->expediteur->name }}
+                                                                        </label>
                                                                     @else
                                                                         --
                                                                     @endif
                                                                 </td>
                                                                 <td>{{ $bundel->nom_destinataire }}</td>
-                                                                <td>{{ $bundel->montant }}</td>
+                                                                <td>{{ $bundel->montant }}DH</td>
                                                                 <td>{{ $bundel->numero_commande }}</td>
                                                                 <td>
                                                                     @if (isset($bundel->livreur->name))
-                                                                        {{ $bundel->livreur->name }}
+                                                                        <label class="badge badge-primary">
+                                                                            {{ $bundel->livreur->name }}
+                                                                        </label>
                                                                     @else
                                                                         --
                                                                     @endif
                                                                 </td>
                                                                 <td>{{ $bundel->ville->libelle }}</td>
-                                                                <td>{{ $bundel->statut->libelle }}</td>
+                                                                <td>
+                                                                    @php
+                                                                        $status = \Str::lower($bundel->statut->libelle);
+                                                                    @endphp
+                                                                    <label class="badge {{ bundel_status($status) }}">
+                                                                        {{ $status }}
+                                                                    </label>
+                                                                </td>
                                                                 <td>
                                                                     <div class="btn-group">
                                                                         <button type="button"

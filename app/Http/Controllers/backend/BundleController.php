@@ -3,7 +3,8 @@
 namespace App\Http\Controllers\backend;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\bandel\crudBandleRequest;
+use App\Http\Requests\bundel\crudBandleRequest;
+use App\Http\Requests\bundel\recuSignatureRequest;
 use App\Models\Bundel;
 use App\Models\City;
 use App\Models\Note;
@@ -116,7 +117,8 @@ class BundleController extends Controller
      */
     public function destroy(Bundel $bundel)
     {
-        UploadFiles::removeFileBase64($bundel->signature);
+        UploadFiles::removeFile($bundel->signature);
+        UploadFiles::removeFile($bundel->recu);
 
         $bundel->delete();
         bundelsCache::removeBundelsCache(true);
@@ -148,8 +150,8 @@ class BundleController extends Controller
         return redirect_with_flash("msgSuccess", "informations mises à jour avec succès", "bundels");
     }
 
-    // get bundel signature form
-    public function getBundelSignature($bundel_id)
+    // get bundel signature receipt form
+    public function getBundelSignatureReceipt($bundel_id)
     {
         $bundel = Bundel::find($bundel_id);
         if ($bundel == null) {
@@ -163,19 +165,34 @@ class BundleController extends Controller
             $oldSignature = $bundel->signature;
         }
 
-        return view('backend.views.bundels.signature.signature-form', compact('bundel_id', "title", "oldSignature"));
+        $oldReceipt = '';
+        if ($bundel->recu != "" and file_exists(public_path($bundel->recu))) {
+            $oldReceipt = $bundel->recu;
+        }
+
+        return view('backend.views.bundels.signature.signature-form', compact('bundel_id', "title", "oldSignature", "oldReceipt"));
     }
 
-    // update bundel signature
-    public function updateBundelSignature(Request $request)
+    // update bundel signature - receipt
+    public function updateBundelSignatureReceipt(recuSignatureRequest $request)
     {
-        $bundel = Bundel::find($request->bundel_id);
+        $bundel_id = $request->bundel_id;
+        $bundel = Bundel::find($bundel_id);
 
-        $storagePath = 'assets/dist/storage/signatures/'; // create signatures folder in public directory
-        $fileinformation = UploadFiles::updateFileBase64($request->signed, $storagePath, $bundel->signature);
+        if ($request->has('signed') and $request->signed != null) {
+            // create signatures folder in public directory
+            $storagePathSignature = 'assets/dist/storage/signatures/';
+            $signatureInformation = UploadFiles::updateFileBase64($request->signed, $storagePathSignature, $bundel->signature);
+            $bundel->fill(['signature' => $signatureInformation['path']])->save();
+        }
 
-        $bundel->fill(['signature' => $fileinformation['path']])->save();
+        if ($request->hasFile("receipt")) {
+            // create recu folder in public directory
+            $storagePathRecu = 'assets/dist/storage/receipt';
+            $recuInformation = UploadFiles::updateFile($request->receipt, $storagePathRecu, $bundel->recu);
+            $bundel->fill(['recu' => $recuInformation['file_path']])->save();
+        }
 
-        return redirect_with_flash("msgSuccess", "La signature a été enregistrée avec succès", "bundels");
+        return redirect_with_flash("msgSuccess", "La signature a été enregistrée avec succès", "bundels/signature/" . $bundel_id);
     }
 }

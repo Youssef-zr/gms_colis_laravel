@@ -10,29 +10,14 @@
     <!-- Sidebar -->
     <div class="sidebar">
         <!-- Sidebar user panel (optional) -->
-        {{-- <div class="user-panel py-2 mb-3 d-flex">
-            @if (auth()->user()->roles[0]->name == 'client')
-                <div class="info text-center" id="client">
-                    <img src="{{ url(auth()->user()->client->chemin) }}"
-                        alt="{{ auth()->user()->client->raison_sociale }}">
-                    <a href="{{ route('user.edit_profile') }}" class="d-block text-capitalize">{{ auth()->user()->client->raison_sociale }}</a>
-                </div>
-            @else
-                <div class="info text-center" id="user">
-                    <img src="{{ url(auth()->user()->chemin) }}" alt="{{ auth()->user()->name }}">
-                    <a href="{{ route('user.edit_profile') }}" class="d-block text-capitalize">{{ auth()->user()->name }}</a>
-                </div>
-            @endif
-        </div> --}}
-
         <div class="user-panel mt-3 pb-3 mb-3 d-flex">
             <div class="image">
-              <img src="{{ url(auth()->user()->path) }}" class="img-circle elevation-2" alt="User Image">
+                <img src="{{ url(auth()->user()->path) }}" class="img-circle elevation-2" alt="User Image">
             </div>
             <div class="info">
-              <a href="{{ route('user.edit_profile') }}" class="d-block">{{ auth()->user()->name }}</a>
+                <a href="{{ route('user.edit_profile') }}" class="d-block">{{ auth()->user()->name }}</a>
             </div>
-          </div>
+        </div>
 
         <!-- Sidebar Menu -->
         <nav class="mt-2 text-capitalize">
@@ -52,169 +37,169 @@
 
                 {{-- statuses links --}}
                 {{-- @can('statuts_index') --}}
-                    <li class="nav-header">statuts</li>
-                    <li class="nav-item has-treeview {{ active_menu('statuses')[0] }}">
-                        <a href="#" class="nav-link {{ active_menu('statuses')[1] }}">
-                            <i class="nav-icon fa fa-power-off"></i>
-                            <p>
-                                statuts
-                                <i class="fa fa-angle-left right"></i>
-                            </p>
-                        </a>
-                        <ul class="nav nav-treeview">
-                            {{-- @can('ajouter_ville') --}}
-                                <li class="nav-item">
-                                    <a href="{{ adminUrl('statuses/create') }}"
-                                        class="nav-link {{ setActive('statuses/create') }} ">
-                                        <i class="fa fa-plus-circle nav-icon"></i>
-                                        <p>nouveau</p>
-                                    </a>
-                                </li>
-                            {{-- @endcan --}}
-                            {{-- @can('liste_statuts') --}}
-                                <li class="nav-item">
-                                    <a href="{{ adminUrl('statuses') }}" class="nav-link {{ setActive('statuses') }} ">
-                                        <i class="fa fa-chevron-right nav-icon"></i>
-                                        <p>list des statuts</p>
-                                    </a>
-                                </li>
-                            {{-- @endcan --}}
-                        </ul>
-                    </li>
+                <li class="nav-header">statuts</li>
+                <li class="nav-item has-treeview {{ active_menu('statuses')[0] }}">
+                    <a href="#" class="nav-link {{ active_menu('statuses')[1] }}">
+                        <i class="nav-icon fa fa-power-off"></i>
+                        <p>
+                            statuts
+                            <i class="fa fa-angle-left right"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        {{-- @can('ajouter_statut') --}}
+                        <li class="nav-item">
+                            <a href="{{ adminUrl('statuses/create') }}"
+                                class="nav-link {{ setActive('statuses/create') }} ">
+                                <i class="fa fa-plus-circle nav-icon"></i>
+                                <p>nouveau</p>
+                            </a>
+                        </li>
+                        {{-- @endcan --}}
+                        {{-- @can('liste_statuts') --}}
+                        <li class="nav-item">
+                            <a href="{{ adminUrl('statuses') }}" class="nav-link {{ setActive('statuses') }} ">
+                                <i class="fa fa-chevron-right nav-icon"></i>
+                                <p>list des statuts</p>
+                            </a>
+                        </li>
+                        {{-- @endcan --}}
+                    </ul>
+                </li>
                 {{-- @endcan --}}
 
                 {{-- notes links --}}
                 {{-- @can('remarques_index') --}}
-                    <li class="nav-header">remarques</li>
-                    <li class="nav-item has-treeview {{ active_menu('notes')[0] }}">
-                        <a href="#" class="nav-link {{ active_menu('notes')[1] }}">
-                            <i class="nav-icon fa fa-commenting-o "></i>
-                            <p>
-                                remarques
-                                <i class="fa fa-angle-left right"></i>
-                            </p>
-                        </a>
-                        <ul class="nav nav-treeview">
-                            {{-- @can('ajouter_remarque') --}}
-                                <li class="nav-item">
-                                    <a href="{{ adminurl('notes/create') }}"
-                                        class="nav-link {{ setActive('notes/create') }} ">
-                                        <i class="fa fa-plus-circle nav-icon"></i>
-                                        <p>nouveau</p>
-                                    </a>
-                                </li>
-                            {{-- @endcan --}}
-                            {{-- @can('liste_remarque') --}}
-                                <li class="nav-item">
-                                    <a href="{{ adminurl('notes') }}" class="nav-link {{ setActive('notes') }} ">
-                                        <i class="fa fa-chevron-right nav-icon"></i>
-                                        <p>list des remarques</p>
-                                    </a>
-                                </li>
-                            {{-- @endcan --}}
-                        </ul>
-                    </li>
+                <li class="nav-header">remarques</li>
+                <li class="nav-item has-treeview {{ active_menu('notes')[0] }}">
+                    <a href="#" class="nav-link {{ active_menu('notes')[1] }}">
+                        <i class="nav-icon fa fa-commenting-o"></i>
+                        <p>
+                            remarques
+                            <i class="fa fa-angle-left right"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        {{-- @can('ajouter_remarque') --}}
+                        <li class="nav-item">
+                            <a href="{{ adminurl('notes/create') }}"
+                                class="nav-link {{ setActive('notes/create') }} ">
+                                <i class="fa fa-plus-circle nav-icon"></i>
+                                <p>nouveau</p>
+                            </a>
+                        </li>
+                        {{-- @endcan --}}
+                        {{-- @can('liste_remarque') --}}
+                        <li class="nav-item">
+                            <a href="{{ adminurl('notes') }}" class="nav-link {{ setActive('notes') }} ">
+                                <i class="fa fa-chevron-right nav-icon"></i>
+                                <p>list des remarques</p>
+                            </a>
+                        </li>
+                        {{-- @endcan --}}
+                    </ul>
+                </li>
                 {{-- @endcan --}}
 
                 {{-- cities links --}}
                 {{-- @can('ville_index') --}}
-                    <li class="nav-header">villes</li>
-                    <li class="nav-item has-treeview {{ active_menu('cities')[0] }}">
-                        <a href="#" class="nav-link {{ active_menu('cities')[1] }}">
-                            <i class="nav-icon fa fa-map"></i>
-                            <p>
-                                villes
-                                <i class="fa fa-angle-left right"></i>
-                            </p>
-                        </a>
-                        <ul class="nav nav-treeview">
-                            {{-- @can('ajouter_ville') --}}
-                                <li class="nav-item">
-                                    <a href="{{ adminUrl('cities/create') }}"
-                                        class="nav-link {{ setActive('cities/create') }} ">
-                                        <i class="fa fa-plus-circle nav-icon"></i>
-                                        <p>nouveau</p>
-                                    </a>
-                                </li>
-                            {{-- @endcan --}}
-                            {{-- @can('liste_villes') --}}
-                                <li class="nav-item">
-                                    <a href="{{ adminUrl('cities') }}" class="nav-link {{ setActive('cities') }} ">
-                                        <i class="fa fa-chevron-right nav-icon"></i>
-                                        <p>list des villes</p>
-                                    </a>
-                                </li>
-                            {{-- @endcan --}}
-                        </ul>
-                    </li>
+                <li class="nav-header">villes</li>
+                <li class="nav-item has-treeview {{ active_menu('cities')[0] }}">
+                    <a href="#" class="nav-link {{ active_menu('cities')[1] }}">
+                        <i class="nav-icon fa fa-map"></i>
+                        <p>
+                            villes
+                            <i class="fa fa-angle-left right"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        {{-- @can('ajouter_ville') --}}
+                        <li class="nav-item">
+                            <a href="{{ adminUrl('cities/create') }}"
+                                class="nav-link {{ setActive('cities/create') }} ">
+                                <i class="fa fa-plus-circle nav-icon"></i>
+                                <p>nouveau</p>
+                            </a>
+                        </li>
+                        {{-- @endcan --}}
+                        {{-- @can('liste_villes') --}}
+                        <li class="nav-item">
+                            <a href="{{ adminUrl('cities') }}" class="nav-link {{ setActive('cities') }} ">
+                                <i class="fa fa-chevron-right nav-icon"></i>
+                                <p>list des villes</p>
+                            </a>
+                        </li>
+                        {{-- @endcan --}}
+                    </ul>
+                </li>
                 {{-- @endcan --}}
 
                 {{-- bundels links --}}
-                {{-- @can('ville_index') --}}
-                    <li class="nav-header">colis</li>
-                    <li class="nav-item has-treeview {{ active_menu('bundels')[0] }}">
-                        <a href="#" class="nav-link {{ active_menu('bundels')[1] }}">
-                            <i class="nav-icon fa fa-shopping-basket "></i>
-                            <p>
-                                colis
-                                <i class="fa fa-angle-left right"></i>
-                            </p>
-                        </a>
-                        <ul class="nav nav-treeview">
-                            {{-- @can('ajouter_colis') --}}
-                                <li class="nav-item">
-                                    <a href="{{ adminUrl('bundels/create') }}"
-                                        class="nav-link {{ setActive('bundels/create') }} ">
-                                        <i class="fa fa-plus-circle nav-icon"></i>
-                                        <p>nouveau</p>
-                                    </a>
-                                </li>
-                            {{-- @endcan --}}
-                            {{-- @can('liste_colis') --}}
-                                <li class="nav-item">
-                                    <a href="{{ adminUrl('bundels') }}" class="nav-link {{ setActive('bundels') }} ">
-                                        <i class="fa fa-chevron-right nav-icon"></i>
-                                        <p>list des colis</p>
-                                    </a>
-                                </li>
-                            {{-- @endcan --}}
-                        </ul>
-                    </li>
+                {{-- @can('colis_index') --}}
+                <li class="nav-header">colis</li>
+                <li class="nav-item has-treeview {{ active_menu('bundels')[0] }}">
+                    <a href="#" class="nav-link {{ active_menu('bundels')[1] }}">
+                        <i class="nav-icon fa fa-shopping-basket"></i>
+                        <p>
+                            colis
+                            <i class="fa fa-angle-left right"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        {{-- @can('ajouter_colis') --}}
+                        <li class="nav-item">
+                            <a href="{{ adminUrl('bundels/create') }}"
+                                class="nav-link {{ setActive('bundels/create') }} ">
+                                <i class="fa fa-plus-circle nav-icon"></i>
+                                <p>nouveau</p>
+                            </a>
+                        </li>
+                        {{-- @endcan --}}
+                        {{-- @can('liste_colis') --}}
+                        <li class="nav-item">
+                            <a href="{{ adminUrl('bundels') }}" class="nav-link {{ setActive('bundels') }} ">
+                                <i class="fa fa-chevron-right nav-icon"></i>
+                                <p>list des colis</p>
+                            </a>
+                        </li>
+                        {{-- @endcan --}}
+                    </ul>
+                </li>
                 {{-- @endcan --}}
 
-                {{-- clients links --}}
-                @can('clients_index')
-                    <li class="nav-header">clients</li>
-                    <li class="nav-item has-treeview {{ active_menu('clients')[0] }}">
-                        <a href="#" class="nav-link {{ active_menu('clients')[1] }}">
-                            <i class="nav-icon fa fa-users"></i>
-                            <p>
-                                clients
-                                <i class="fa fa-angle-left right"></i>
-                            </p>
-                        </a>
-                        <ul class="nav nav-treeview">
-                            @can('ajouter_client')
-                                <li class="nav-item">
-                                    <a href="{{ adminUrl('clients/create') }}"
-                                        class="nav-link {{ setActive('clients/create') }} ">
-                                        <i class="fa fa-plus-circle nav-icon"></i>
-                                        <p>nouveau</p>
-                                    </a>
-                                </li>
-                            @endcan
-                            @can('liste_clients')
-                                <li class="nav-item">
-                                    <a href="{{ adminUrl('clients') }}" class="nav-link {{ setActive('clients') }} ">
-                                        <i class="fa fa-chevron-right nav-icon"></i>
-                                        <p>list des clients</p>
-                                    </a>
-                                </li>
-                            @endcan
-                        </ul>
-                    </li>
-                @endcan
-                
+                {{-- payments links --}}
+                {{-- @can('paiments_index') --}}
+                <li class="nav-header">paiments</li>
+                <li class="nav-item has-treeview {{ active_menu('payments')[0] }}">
+                    <a href="#" class="nav-link {{ active_menu('payments')[1] }}">
+                        <i class="nav-icon fa fa-credit-card-alt"></i>
+                        <p>
+                            paiments
+                            <i class="fa fa-angle-left right"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        {{-- @can('ajouter_paiments') --}}
+                        <li class="nav-item">
+                            <a href="{{ adminUrl('payments/create') }}"
+                                class="nav-link {{ setActive('payments/create') }} ">
+                                <i class="fa fa-plus-circle nav-icon"></i>
+                                <p>nouveau</p>
+                            </a>
+                        </li>
+                        {{-- @endcan --}}
+                        {{-- @can('liste_paiments') --}}
+                        <li class="nav-item">
+                            <a href="{{ adminUrl('payments') }}" class="nav-link {{ setActive('payments') }} ">
+                                <i class="fa fa-chevron-right nav-icon"></i>
+                                <p>list des paiments</p>
+                            </a>
+                        </li>
+                        {{-- @endcan --}}
+                    </ul>
+                </li>
+                {{-- @endcan --}}
+
                 {{-- users links --}}
                 @can('utilisateurs_index')
                     <li class="nav-header">Utilisateurs</li>

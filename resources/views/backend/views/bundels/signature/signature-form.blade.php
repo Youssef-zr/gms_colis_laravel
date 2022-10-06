@@ -24,7 +24,16 @@
 
         .kbw-signature {
             width: 100%;
-            height: 200px;
+            height: 250px;
+            border-color: #999;
+            border-radius: 10px;
+            overflow: hidden
+        }
+
+        .img-receipt {
+            width: 300px;
+            height: 300px;
+            margin: auto
         }
     </style>
 @endpush
@@ -64,31 +73,62 @@
                             <h3><i class="fas fa-file-signature"></i> {{ $title }} </h3>
                         </div>
                         <div class="card-body">
-                            {!! Form::open(['route' => ['bundel.signature.update', 'bundel_id'], 'method' => 'patch']) !!}
+                            {!! Form::open(['route' => ['bundel.signature.update', 'bundel_id'], 'method' => 'patch', 'files' => true]) !!}
                             {!! Form::hidden('bundel_id', $bundel_id) !!}
                             <div class="row align-items-md-center">
-                                <div class="col-md-12 col-lg-5">
-                                    <div class="form-group mb-1">
-                                        {!! Form::label('signature', 'Signature', ['class' => 'form-label']) !!}
-                                        {!! Form::textarea('signature', null, [
-                                            'name' => 'signed',
-                                            'style' => 'display: none',
+                                <div class="col-12 col-md-6">
+                                    <div class="form-group mb-1 {{ $errors->has('signed') ? 'has-error' : '' }}">
+                                        {!! Form::label('signed', 'signed', ['class' => 'form-label']) !!}
+                                        {!! Form::textarea('signed', null, ['style' => 'display: none', 'class' => 'form-control']) !!}
+                                        <div id="sig"></div>
+
+                                        @if ($errors->has('libelle'))
+                                            <span class="help-block">
+                                                <strong>{{ $errors->first('libelle') }}</strong>
+                                            </span>
+                                        @endif
+                                    </div>
+                                </div>
+                                @if (isset($oldSignature) and $oldSignature != null)
+                                    <div class="col-12 col-md-6 col-lg-5 text-center">
+                                        <img src="{{ url($oldSignature) }}" class="img-responsive" alt="signature">
+                                    </div>
+                                @endif
+                            </div>
+
+                            <div class="row align-items-md-center">
+                                <div class="col-12 col-md-12 col-lg-6">
+                                    <div class="form-group {{ $errors->has('receipt') ? 'has-error' : '' }}">
+                                        {!! Form::label('receipt', 'receipt', ['class' => 'form-label']) !!}
+                                        {!! Form::file('receipt', [
+                                            'name' => 'receipt',
                                             'class' => 'form-control',
                                         ]) !!}
-                                        <div id="sig"></div>
+                                        <small id="emailHelp" class="form-text text-muted">image de recu doit etre de type (jpg,png,jpeg,gif,svg) min (100x350)
+                                            max (350x350) | max taille (150KB)</small>
+                                        @if ($errors->has('receipt'))
+                                            <span class="help-block">
+                                                <strong>{{ $errors->first('receipt') }}</strong>
+                                            </span>
+                                        @endif
                                     </div>
-                                    <button type="submit" class="btn btn-primary">
-                                        <i class="fa fa-send"></i>
-                                        Valider
-                                    </button>
-                                    <button id="clear" class="btn btn-danger">
-                                        <i class="fa fa-times"></i>
-                                        Effacer
-                                    </button>
+
+                                    <div class="actions">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fa fa-send"></i>
+                                            Valider
+                                        </button>
+                                        <button id="clear" class="btn btn-danger">
+                                            <i class="fa fa-times"></i>
+                                            Effacer
+                                        </button>
+                                    </div>
                                 </div>
-                                @if ($oldSignature != null)
-                                    <div class="col-12 col-md-6 col-lg-7">
-                                        <img src="{{ url($oldSignature) }}" alt="signature">
+                                @if (isset($oldReceipt) and $oldReceipt != null)
+                                    <div class="col-12 col-md-6 col-lg-5 text-center">
+                                        <div class="img-receipt">
+                                            <img src="{{ url($oldReceipt) }}" class="img-responsive" alt="signature">
+                                        </div>
                                     </div>
                                 @endif
                             </div>
@@ -110,7 +150,7 @@
     <script>
         $.widget("ns.widget", {});
         var sig = $('#sig').signature({
-            syncField: '#signature',
+            syncField: '#signed',
             syncFormat: 'PNG'
         });
 
@@ -118,6 +158,7 @@
             e.preventDefault();
             sig.signature('clear');
             $("#signature64").val('');
+            $('input[type="file"]').val('');
         });
         $(() => {})
     </script>
