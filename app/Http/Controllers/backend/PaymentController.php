@@ -67,7 +67,7 @@ class PaymentController extends Controller
         foreach ($bundels as $bundel_id) {
 
             $bundeInfo = Bundel::where('id', $bundel_id)->first();
-            $bundeInfo->fill(['paye' => "1"])->save();
+            $bundeInfo->fill(['paye' => "1","id_statut"=>9])->save();
 
             $newLpayment = new Lpaiment();
             $newLpayment->id_paiement = $newPayment->id;
@@ -129,7 +129,7 @@ class PaymentController extends Controller
         if ($idBundelsToDelete != []) {
             $bundels = Bundel::whereIn("id", $idBundelsToDelete)->get();
             foreach ($bundels as $bundel) {
-                $bundel->fill(['paye' => 0])->save();
+                $bundel->fill(['paye' => 0,"id_statut"=>5])->save();
                 Lpaiment::where("id_colis", $bundel->id)->first()->delete();
             }
         }
@@ -140,13 +140,12 @@ class PaymentController extends Controller
         if ($idBundelsInsert != []) {
             foreach ($idBundelsInsert as $bundel_id) {
                 $bundelInfo = Bundel::find($bundel_id);
-                $bundelInfo->fill(['paye' => 1])->save();
-                
+                $bundelInfo->fill(['paye' => 1,"id_statut"=>9])->save();
+                dd($bundelInfo);
                 $newLpayment = new Lpaiment();
                 $newLpayment->id_paiement = $payment->id;
                 $newLpayment->id_colis = $bundelInfo->id;
                 $newLpayment->save();
-
             }
         }
 

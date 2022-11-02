@@ -76,7 +76,7 @@ class UserController extends Controller
         $input['password'] = Hash::make($input['password']);
         $input = Arr::except($input, ['confirm-password']);
 
-        dd($input);
+        // dd($input);
 
         $input['roles_name'] = $request->roles_name;
         $input['IDClient'] = $request->IDClient and $request->roles_name[0] != "developpeur" ? $request->IDClient : null;

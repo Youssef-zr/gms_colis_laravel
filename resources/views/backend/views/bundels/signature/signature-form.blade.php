@@ -148,18 +148,20 @@
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
     <script type="text/javascript" src="http://keith-wood.name/js/jquery.signature.js"></script>
     <script>
-        $.widget("ns.widget", {});
-        var sig = $('#sig').signature({
-            syncField: '#signed',
-            syncFormat: 'PNG'
-        });
+     
+        $(() => {
+            $.widget("ns.widget", {});
+            var sig = $('#sig').signature({
+                syncField: '#signed',
+                syncFormat: 'PNG'
+            });
 
-        $('#clear').click(function(e) {
-            e.preventDefault();
-            sig.signature('clear');
-            $("#signature64").val('');
-            $('input[type="file"]').val('');
-        });
-        $(() => {})
+            $('#clear').click(function(e) {
+                e.preventDefault();
+                sig.signature('clear');
+                $("#signature64").val('');
+                $('input[type="file"]').val('');
+            });
+        })
     </script>
 @endpush

@@ -271,9 +271,3 @@
         });
     </script>
 @endpush
-
-@push('css')
-    <style>
-
-    </style>
-@endpush
