@@ -18,13 +18,13 @@ class CreatePaimentsTable extends Migration
             $table->date('date')->nullable();
             $table->longText('recu_paiment')->nullable()->default('--');
             $table->integer('montant')->nullable()->default(0);
-            $table->string("heure");
+            $table->string("heure")->nullable();
 
             $table->unsignedBigInteger('id_livreur')->nullable();
             $table->foreign('id_livreur')->references('id')->on('users')->onDelete('set null');
             $table->unsignedBigInteger('id_expediteur')->nullable();
-            $table->foreign('id_expediteur')->references('id')->on('users')->onDelete('set null');
-            $table->timestamps();
+            $table->foreign('id_expediteur')->references('id')->on('expediteurs')->onDelete('set null');
+            // $table->timestamps();
         });
     }
 

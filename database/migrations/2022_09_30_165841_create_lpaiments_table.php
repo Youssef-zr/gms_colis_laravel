@@ -20,7 +20,7 @@ class CreateLpaimentsTable extends Migration
             $table->foreign('id_paiement')->references('id')->on('paiments')->onDelete('set null');
             $table->unsignedBigInteger('id_colis')->nullable();
             $table->foreign('id_colis')->references('id')->on('colis')->onDelete('set null');
-            $table->timestamps();
+            // $table->timestamps();
         });
     }
 

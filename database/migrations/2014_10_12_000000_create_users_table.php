@@ -27,7 +27,12 @@ class CreateUsersTable extends Migration
             $table->string('path', 100)->nullable()->default('assets/dist/storage/users/default.png');
             $table->dateTime('last_login_at')->nullable();
             $table->string('last_login_ip_address')->nullable();
-            $table->string('role_name');
+            
+            $table->unsignedBigInteger('roles_name')->nullable();
+            $table->foreign('roles_name')->references('id')->on('roles')->onDelete('set null');
+            $table->unsignedBigInteger('id_expediteur')->nullable();
+            $table->foreign('id_expediteur')->references('id')->on('expediteurs')->onDelete('set null');
+
             $table->rememberToken();
             $table->timestamps();
         });

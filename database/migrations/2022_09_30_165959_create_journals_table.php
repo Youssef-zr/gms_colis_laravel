@@ -21,10 +21,10 @@ class CreateJournalsTable extends Migration
             $table->unsignedBigInteger('id_colis')->nullable();
             $table->foreign('id_colis')->references('id')->on('colis')->onDelete('set null');
             $table->unsignedBigInteger('id_statut')->nullable();
-            $table->foreign('id_statut')->references('id')->on('status')->onDelete('set null');
+            $table->foreign('id_statut')->references('id')->on('statut')->onDelete('set null');
             $table->unsignedBigInteger('id_remarques')->nullable();
             $table->foreign('id_remarques')->references('id')->on('remarques')->onDelete('set null');
-            $table->timestamps();
+            // $table->timestamps();
         });
     }
 

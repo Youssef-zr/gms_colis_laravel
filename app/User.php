@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Models\Shipper;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
@@ -50,5 +51,15 @@ class User extends Authenticatable
         }
 
         return $lastLoginDate;
+    }
+
+    /**
+     * Get the expediteur associated with the User
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function expediteur()
+    {
+        return $this->hasOne(Shipper::class, 'id', 'id_expediteur');
     }
 }

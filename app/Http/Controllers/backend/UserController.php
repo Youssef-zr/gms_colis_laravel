@@ -24,7 +24,6 @@ class UserController extends Controller
         $this->middleware('permission:nouveau_utilisateur', ['only' => ['create', "store"]]);
         $this->middleware('permission:editer_utilisateur', ['only' => ['edit', "update"]]);
         $this->middleware('permission:supprimer_utilisateur', ['only' => ['destroy']]);
-
     }
 
     /**
@@ -75,8 +74,6 @@ class UserController extends Controller
         $input = $request->all();
         $input['password'] = Hash::make($input['password']);
         $input = Arr::except($input, ['confirm-password']);
-
-        // dd($input);
 
         $input['roles_name'] = $request->roles_name;
         $input['IDClient'] = $request->IDClient and $request->roles_name[0] != "developpeur" ? $request->IDClient : null;

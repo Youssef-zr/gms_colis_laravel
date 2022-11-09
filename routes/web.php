@@ -1,8 +1,8 @@
 <?php
 
-use App\Models\Bundel;
-use App\Models\City;
+use App\Models\Colis;
 use App\Models\Lpaiment;
+use App\Models\Ville;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -37,31 +37,35 @@ Route::post('/login', ['uses' => 'Auth\LoginController@login', 'middleware' => '
 // });
 
 // Dashboard Routes BackEnd
-Route::group(['prefix' => "dashboard", "middleware" => ['auth'], 'namespace' => 'backend'], function () {
+Route::group(['prefix' => "admin", "middleware" => ['auth'], 'namespace' => 'backend'], function () {
 
     // dashboard routes
     Route::get('/', 'DashboardController@welcome');
     route::get('/logout', "DashboardController@logout");
 
-    // cities rotes
-    Route::resource('/cities', "CityController");
+    // villes rotes
+    Route::resource('/villes', "VilleController");
 
-    // statuses rotes
-    Route::resource('/statuses', "statusController");
+    // statuts rotes
+    Route::resource('/statuts', "StatutController");
 
-    // notes rotes
-    Route::resource('/notes', "NoteController");
+    // expediteurs rotes
+    Route::resource('/expediteurs', "ExpediteurController");
 
-    // bundels (colis) rotes
-    Route::resource('/bundels', "BundleController");
-    Route::patch('/bundelsUpdateDelivery', "BundleController@updateBundleDelivery")->name('staff.updateDelivery');
-    Route::get('/bundels/signature/{bundel_id}', "BundleController@getBundelSignatureReceipt")->name('bundel.signature.show');
-    Route::patch('/bundels/signature/{bundel_id}', "BundleController@updateBundelSignatureReceipt")->name('bundel.signature.update');
+    // remarques rotes
+    Route::resource('/remarques', "RemarqueController");
 
-    // payments routes
-    Route::resource('/payments', "PaymentController");
+    // colis rotes
+    Route::resource('/colis', "ColisController");
+    Route::get("/search/colis","ColisController@search")->name('colis.search');
+    Route::patch('/colisUpdateDelivery', "ColisController@updateColisDelivery")->name('staff.updateDelivery');
+
+    // paiemenst routes
+    Route::resource('/paiements', "PaiementController");
+    Route::get('/paiement/rechercher', "PaiementController@search")->name('paiements.search');
+
     // get bundels not payed for selected (expediteur and livreur)
-    Route::get('/bundels_status/payments', "PaymentController@getBundelsNotPaid")->name('payments.colis_not_paid');
+    Route::get('/colis-statut/paiement', "PaiementController@getBundelsNotPaid")->name('payments.colis_not_paid');
 
     // users resource
     Route::resource('/users', "UserController");
@@ -97,7 +101,7 @@ Route::get('/test', function () {
 
     $payment = Lpaiment::where('id_paiement', 2)->pluck('id_colis')->toArray();
 
-    $bundelsAmount = Bundel::whereIn("id", $payment)->pluck('montant')->toArray();
+    $bundelsAmount = Colis::whereIn("id", $payment)->pluck('montant')->toArray();
     $collection = new Collection($bundelsAmount);
 
     dd($collection->sum());
@@ -114,7 +118,7 @@ Route::get('/test', function () {
     $cities = json_decode(file_get_contents($path), true);
 
     foreach ($cities['cities'] as $city) {
-        $new = new City();
+        $new = new Ville();
         $new->libelle = $city["city"];
         $new->save();
     }

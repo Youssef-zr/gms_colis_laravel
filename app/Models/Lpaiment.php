@@ -2,11 +2,12 @@
 
 namespace App\Models;
 
-use App\Models\Bundel;
+use App\Models\Colis;
 use Illuminate\Database\Eloquent\Model;
 
 class Lpaiment extends Model
 {
+    public $timestamps = false;
     protected $table = "Lpaiments";
     protected $guarded = [];
 
@@ -17,6 +18,6 @@ class Lpaiment extends Model
      */
     public function bundels()
     {
-        return $this->hasMany(Bundel::class, 'id', 'id_colis');
+        return $this->hasMany(Colis::class, 'id', 'id_colis');
     }
 }

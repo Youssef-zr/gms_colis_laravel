@@ -9,12 +9,17 @@ use Illuminate\Support\Facades\File;
 trait UploadFiles
 {
     // store new file
-    public static function storeFile($file, $storagePath)
+    public static function storeFile($file, $storagePath, $customName = "")
     {
         $fileName = pathinfo($file, PATHINFO_FILENAME);
 
         $originalname = $file->getClientOriginalName();
-        $file_name = date('Y-m-d') . "-" . $fileName . "-" . time() . "." . $file->getClientOriginalExtension();
+        $fileExtension = $file->getClientOriginalExtension();
+
+        $file_name = date('Y-m-d') . "-" . $fileName . "-" . time();
+        $file_name = $customName != "" ? $customName : $file_name;
+        $file_name = $file_name . "." . $fileExtension;
+
         $path = $file->storeAs($storagePath, $file_name);
 
         $fileInformation = [
@@ -31,10 +36,11 @@ trait UploadFiles
     }
 
     // update existing file
-    public static function updateFile($file, $path, $oldFilePath, $default = null)
+    public static function updateFile($file, $path, $oldFilePath, $default = null, $customName = null)
     {
         UploadFiles::removeFile($oldFilePath, $default);
-        return UploadFiles::storeFile($file, $path);
+        
+        return UploadFiles::storeFile($file, $path, $customName);
     }
 
     // remove existing file
@@ -46,12 +52,13 @@ trait UploadFiles
     }
 
     // store new file base64
-    public static function storeFileBase64($file, $storagePath)
+    public static function storeFileBase64($file, $storagePath, $customName = "")
     {
         $image_parts = explode(";base64,", $file);
         $image_type = explode("image/", $image_parts[0])[1];
         $image_base64 = base64_decode($image_parts[1]);
-        $file_name = uniqid() . '.' . $image_type;
+        $file_name = $customName != "" ? $customName : uniqid();
+        $file_name = $file_name . '.' . $image_type;
         $path = $storagePath . $file_name;
 
         file_put_contents(public_path($path), $image_base64);
@@ -66,10 +73,11 @@ trait UploadFiles
     }
 
     // update existing file base64
-    public static function updateFileBase64($file, $storagePath, $oldFilePath)
+    public static function updateFileBase64($file, $storagePath, $oldFilePath, $customName = "")
     {
         UploadFiles::removeFile($oldFilePath);
-        return UploadFiles::storeFileBase64($file, $storagePath);
+
+        return UploadFiles::storeFileBase64($file, $storagePath, $customName);
     }
 
     // convert image to base 64

@@ -31,14 +31,15 @@ class CreateColiesTable extends Migration
             $table->unsignedBigInteger('id_livreur')->nullable();
             $table->foreign('id_livreur')->references('id')->on('users')->onDelete('set null');
             $table->unsignedBigInteger('id_expediteur')->nullable();
-            $table->foreign('id_expediteur')->references('id')->on('users')->onDelete('set null');
+            $table->foreign('id_expediteur')->references('id')->on('expediteurs')->onDelete('set null');
             $table->unsignedBigInteger('id_ville')->nullable();
             $table->foreign('id_ville')->references('id')->on('villes')->onDelete('set null');
             $table->unsignedBigInteger('id_statut')->nullable()->default(1);
-            $table->foreign('id_statut')->references('id')->on('status')->onDelete('set null');
+            $table->foreign('id_statut')->references('id')->on('statut')->onDelete('set null');
             $table->unsignedBigInteger('id_remarques')->nullable();
             $table->foreign('id_remarques')->references('id')->on('remarques')->onDelete('set null');
             $table->timestamps();
+            // $table->softDeletes();
         });
     }
 

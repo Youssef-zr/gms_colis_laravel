@@ -15,7 +15,7 @@ if (!function_exists('adminUrl')) {
         if (env('APP_ENV') == "production") {
             return secure_url('/dashboard/' . $url);
         } else {
-            return url('/dashboard/' . $url);
+            return url('/admin/' . $url);
         }
     }
 }
@@ -356,6 +356,7 @@ if (!function_exists('bundel_status')) {
             'annulé' => "bg-danger",
             'retourné' => "bg-info",
         ];
+        
         if (in_array($status, ['livré', "en attente", "annulé", "retourné"])) {
 
             return $bundel_status[$status];

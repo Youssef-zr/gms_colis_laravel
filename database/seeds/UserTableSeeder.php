@@ -23,14 +23,14 @@ class UserTableSeeder extends Seeder
             'phone' => '0600000022',
             'password' => bcrypt('nbx-de08shah^@@'),
             "status" => 'activé',
-            "role_name" => 'developpeur',
         ]);
 
         $role = Role::create(['name' => 'developpeur']);
+        $developer->fill(['roles_name' => $role->id]);
         $permissions = Permission::pluck('id', 'id')->toArray();
         $role->syncPermissions($permissions);
         $role->revokePermissionTo("tableau_bord_index");
-        $developer->assignRole([$role->id]);
+        $developer->assignRole([$role->id])->save();
 
         // -----------------------------------------
         // "admin" role
@@ -41,51 +41,13 @@ class UserTableSeeder extends Seeder
             'phone' => '0600000001',
             'password' => bcrypt('123456'),
             "status" => 'activé',
-            "role_name" => 'admin',
         ]);
 
         $role = Role::create(['name' => 'admin']);
+        $admin->fill(['roles_name' => $role->id]);
         $permissions = Permission::pluck('id', 'id')->toArray();
         $role->syncPermissions($permissions);
-        $admin->assignRole([$role->id]);
-
-        // -----------------------------------------
-        //    "expiditeur" role
-        // -----------------------------------------
-        $ExpediteursUsers = [
-            [
-                'name' => 'said',
-                'email' => 'expediteur1@app.com',
-                'phone' => '0600000000',
-                'password' => bcrypt('123456'),
-                "status" => 'activé',
-                "role_name" => 'expediteur',
-
-            ],
-            [
-                'name' => 'rachid',
-                'email' => 'expediteur2@app.com',
-                'phone' => '0700000000',
-                'password' => bcrypt('123456'),
-                "status" => 'activé',
-                "role_name" => 'expediteur',
-
-            ],
-        ];
-
-        $expiditeurPermission = [
-            // "tableau_bord_index",
-        ];
-
-        $roleExpediteur = Role::create(['name' => 'expediteur']);
-        $roleExpediteur->syncPermissions($expiditeurPermission);
-
-        foreach ($ExpediteursUsers as $expediteur) {
-
-            $newExpediteur = new User();
-            $newExpediteur->fill($expediteur)->save();
-            $newExpediteur->assignRole([$roleExpediteur->id]);
-        }
+        $admin->assignRole([$role->id])->save();
 
         // -----------------------------------------
         //    "livreurs" role
@@ -97,8 +59,6 @@ class UserTableSeeder extends Seeder
                 'phone' => '0600000023',
                 'password' => bcrypt('123456'),
                 "status" => 'activé',
-                "role_name" => 'livreur',
-
             ],
             [
                 'name' => 'tarek',
@@ -106,8 +66,6 @@ class UserTableSeeder extends Seeder
                 'phone' => '0700000078',
                 'password' => bcrypt('123456'),
                 "status" => 'activé',
-                "role_name" => 'livreur',
-
             ],
         ];
 
@@ -123,7 +81,47 @@ class UserTableSeeder extends Seeder
             $newLivreur = new User();
             $newLivreur->fill($livreur)->save();
             $newLivreur->assignRole([$roleLivreur->id]);
+            $newLivreur->fill(["roles_name" => $roleLivreur->id])->save();
         }
+        
+        // -----------------------------------------
+        //    "expiditeur" role
+        // -----------------------------------------
+        $ExpediteursUsers = [
+            [
+                'name' => 'said',
+                'email' => 'expediteur1@app.com',
+                'phone' => '0600000000',
+                'password' => bcrypt('123456'),
+                "status" => 'activé',
+                "id_expediteur" => random_int(1,25),
+            ],
+            [
+                'name' => 'rachid',
+                'email' => 'expediteur2@app.com',
+                'phone' => '0700000000',
+                'password' => bcrypt('123456'),
+                "status" => 'activé',
+                "id_expediteur" => random_int(1,25),
+            ],
+        ];
+
+        $expiditeurPermission = [
+            // "tableau_bord_index",
+        ];
+
+        $roleExpediteur = Role::create(['name' => 'expediteur']);
+        $roleExpediteur->syncPermissions($expiditeurPermission);
+
+        foreach ($ExpediteursUsers as $expediteur) {
+
+            $newExpediteur = new User();
+            $newExpediteur->fill($expediteur)->save();
+            $newExpediteur->assignRole([$roleExpediteur->id]);
+            $newExpediteur->fill(["roles_name" => $roleExpediteur->id])->save();
+        }
+
+        
 
     }
 }
