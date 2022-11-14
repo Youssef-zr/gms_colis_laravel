@@ -1,27 +1,8 @@
 @extends('backend.layouts.master')
 
 @push('css')
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.23/css/jquery.dataTables.min.css">
-
-    <style>
-        div.dataTables_wrapper {
-            direction: ltr;
-        }
-
-        /* Ensure that the demo table scrolls */
-        th,
-        td {
-            white-space: nowrap;
-        }
-
-        div.dataTables_wrapper {
-            margin: 15px auto 0;
-        }
-
-        .hidden {
-            display: none
-        }
-    </style>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.5.1/css/buttons.dataTables.min.css" />
 @endpush
 
 @section('braidcrump')
@@ -55,17 +36,38 @@
                 <div class="col-xl-12">
                     <div class="card card-primary mg-b-20">
                         <div class="card-body">
-                            <div class="btn-actions text-right">
+                           <!-- btns action -->
+                            <div class="btn p-0" id="actions">
+                                {{-- @can('ajouter_colis') --}}
                                 <div class="btn-group">
-                                    {{-- @can('ajouter_statut') --}}
-                                    <a href="{{ route('remarques.create') }}" class="btn btn-primary btn-sm add"
-                                        data-toggle="tooltip" title=" Nouveau remarque">
+                                    <a href="{{ adminUrl('remarques/create') }}" class="btn btn-primary add mr-2 rounded"
+                                        data-toggle="tooltip" title="Nouvelle colis">
                                         <i class="fa fa-plus"></i>
                                         Nouveau
                                     </a>
-                                    {{-- @endcan --}}
+                                </div>
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-info" data-toggle="dropdown"
+                                        aria-expanded="false">
+                                        <i class="fa fa-cogs"></i>
+                                        Actions
+                                    </button>
+                                    <button type="button" class="btn btn-info border-left dropdown-toggle dropdown-icon"
+                                        data-toggle="dropdown" aria-expanded="false">
+                                        <span class="sr-only">Menu</span>
+                                    </button>
+
+                                    <div class="dropdown-menu" role="menu">
+                                        <label class="dropdown-item mb-0" id="excel">
+
+                                        </label>
+                                        <label class="dropdown-item mb-0" id="pdf">
+
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
+
                             <div id="example_wrapper" class="dataTables_wrapper dt-bootstrap4 no-footer">
                                 <div class="row">
                                     <div class="col-sm-12">
@@ -81,26 +83,27 @@
                                                 <tbody>
                                                     @foreach ($remarques as $remarque)
                                                         <tr>
-                                                            <td>{{ $remarque->id }}</td>
+                                                            <td>{{ $remarque->id_remarques }}</td>
                                                             <td>{{ $remarque->libelle }}</td>
                                                             <td>
                                                                 <div class="btn-group">
 
                                                                     {{-- @can('editer_remarque') --}}
-                                                                    <a href="{{ route('remarques.edit', $remarque->id) }}"
+                                                                    <a href="{{ adminUrl('remarques/' . $remarque->id_remarques . '/edit') }}"
                                                                         class="btn bg-warning btn-sm text-left"
                                                                         title='Éditer' data-toggle="tooltip">
                                                                         <i class="fa fa-edit"></i>
                                                                     </a>
                                                                     {{-- @endcan --}}
+
                                                                     {{-- @can('supprimer_remarque') --}}
-                                                                    {{-- @if ($remarque->id > 10) --}}
-                                                                        <a href="#"
-                                                                            class="btn btn-danger bg-maroon btn-sm text-left delete"
-                                                                            data-id="{{ $remarque->id }}" title='supprimer'
-                                                                            data-toggle="tooltip">
-                                                                            <i class="fa fa-trash"></i>
-                                                                        </a>
+                                                                    {{-- @if ($remarque->id_remarques > 10) --}}
+                                                                    <a href="#"
+                                                                        class="btn btn-danger bg-maroon btn-sm text-left delete"
+                                                                        data-id="{{ $remarque->id_remarques }}"
+                                                                        title='supprimer' data-toggle="tooltip">
+                                                                        <i class="fa fa-trash"></i>
+                                                                    </a>
                                                                     {{-- @endif --}}
                                                                     {{-- @endcan --}}
                                                                 </div>
@@ -169,19 +172,23 @@
 @endsection
 
 @push('js')
-    <script src="https://cdn.datatables.net/1.10.23/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+    <script type="text/javascript"
+        src="https://cdn.datatables.net/v/bs4/jszip-2.5.0/b-2.1.1/b-html5-2.1.1/datatables.min.js"></script>
     <script src="https://cdn.datatables.net/plug-ins/1.10.15/sorting/numeric-comma.js"></script>
     <script>
         $(document).ready(function() {
 
-            $('#example').DataTable({
+            $table = $('#example').DataTable({
                 direction: "ltr",
                 "order": [
                     [0, 'desc']
                 ],
                 "aLengthMenu": [
                     [10, 25, 50, -1],
-                    [10, 25, 50, "All"]
+                    [10, 25, 50, "Tout"]
                 ],
                 "language": {
                     "url": "https://cdn.datatables.net/plug-ins/1.12.1/i18n/fr-FR.json"
@@ -196,7 +203,41 @@
                         "targets": $('#example').find('thead th').length - 1
                     },
                 ],
+                "buttons": [{
+                        extend: 'excelHtml5',
+                        exportOptions: {
+                            columns: [1]
+                        }
+                    },
+                    {
+                        extend: 'pdfHtml5',
+                        exportOptions: {
+                            columns: [1]
+                        }
+                    }
+                ],
             });
+
+            // change style of buttons excel and pdf
+            setTimeout(() => {
+                $table.buttons().container().insertBefore('#example_filter');
+                $('.buttons-excel').toggleClass('btn-secondary btn-success btn-block btn-sm').html(
+                    '<i class="fa fa-file-excel-o"></i> Excel');
+                $('.buttons-pdf').toggleClass('btn-secondary btn-warning btn-block btn-sm').html(
+                    '<i class="fa fa-file-pdf-o"></i> Pdf');
+                $('#example_length').css({
+                    'display': 'block',
+                    'margin-right': "20px"
+                })
+                $('#example_filter').css({marginRight:"15px"});
+
+                // move actions btns to filter container
+                $('#actions').appendTo(".dt-buttons");
+                $('.buttons-pdf').appendTo("#excel")
+                $('.buttons-excel').appendTo("#pdf")
+
+            }, 500);
+
             // hide modal
             $('.hide-modal').click(function() {
                 $('#myModal').slideUp(500);
@@ -223,8 +264,3 @@
     </script>
 @endpush
 
-@push('css')
-    <style>
-
-    </style>
-@endpush

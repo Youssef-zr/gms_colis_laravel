@@ -5,6 +5,7 @@ namespace App\Http\Controllers\backend;
 use App\Http\Controllers\Controller;
 use App\Models\Statut;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class StatutController extends Controller
 {
@@ -41,8 +42,12 @@ class StatutController extends Controller
      */
     public function store(Request $request)
     {
-        $data = $this->validate($request, ['libelle' => 'required|string|unique:statut,libelle']);
+        $rules = [
+            'libelle' => 'required|string|unique:statut,libelle',
+            'color' => 'sometimes|nullable|string',
+        ];
 
+        $data = $this->validate($request, $rules);
         $new = new Statut();
         $new->fill($data)->save();
 
@@ -82,7 +87,11 @@ class StatutController extends Controller
      */
     public function update(Request $request, Statut $statut)
     {
-        $data = $this->validate($request, ['libelle' => 'required|string|unique:statut,libelle,' . $statut->id]);
+        $rules = [
+            "libelle" => 'required', "string", Rule::unique('statut', "libelle")->ignore($statut->id_statut, "id_statut"),
+            'color' => 'sometimes|nullable|string',
+        ];
+        $data = $this->validate($request, $rules);
         $statut->fill($data)->save();
 
         return redirect_with_flash("msgSuccess", "statut mis à jour avec succès", "statuts");

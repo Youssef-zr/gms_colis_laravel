@@ -28,16 +28,3 @@
 </div>
 {{-- End row --}}
 
-@push('js')
-    <script>
-        $(() => {
-
-        })
-    </script>
-@endpush
-
-@push('css')
-    <style>
-
-    </style>
-@endpush

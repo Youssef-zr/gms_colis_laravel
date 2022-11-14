@@ -5,7 +5,6 @@ namespace App\Http\Controllers\backend;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\expediteur\crudExpediteurRequest;
 use App\Models\Expediteur;
-use Illuminate\Http\Request;
 
 class ExpediteurController extends Controller
 {
@@ -17,7 +16,7 @@ class ExpediteurController extends Controller
     public function index()
     {
         $title = "list expediteurs";
-        $expediteurs = Expediteur::where("nom", "not like", "%vide%")->get();
+        $expediteurs = Expediteur::all();
 
         return view("backend.views.expediteurs.index", compact("title", "expediteurs"));
     }
@@ -41,11 +40,11 @@ class ExpediteurController extends Controller
      */
     public function store(crudExpediteurRequest $request)
     {
-
+        dd($request->all());
         $new = new Expediteur();
         $new->fill($request->all())->save();
 
-        return redirect_with_flash("msgSuccess","Expéditeurs ajoutés avec succès","expediteurs");
+        return redirect_with_flash("msgSuccess", "Expéditeurs ajoutés avec succès", "expediteurs");
     }
 
     /**
@@ -69,7 +68,7 @@ class ExpediteurController extends Controller
     {
         $title = "editer expediteur";
 
-        return view("backend.views.expediteurs.update",compact('title',"expediteur"));
+        return view("backend.views.expediteurs.update", compact('title', "expediteur"));
     }
 
     /**
@@ -83,7 +82,7 @@ class ExpediteurController extends Controller
     {
         $expediteur->fill($request->all())->save();
 
-        return redirect_with_flash("msgSuccess","expéditeur mis à jour avec succès","expediteurs");
+        return redirect_with_flash("msgSuccess", "expéditeur mis à jour avec succès", "expediteurs");
     }
 
     /**
@@ -94,8 +93,8 @@ class ExpediteurController extends Controller
      */
     public function destroy(Expediteur $expediteur)
     {
-       $expediteur->delete();
+        $expediteur->delete();
 
-       return redirect_with_flash('msgSuccess',"expéditeur supprimé avec succès","expediteurs");
+        return redirect_with_flash('msgSuccess', "expéditeur supprimé avec succès", "expediteurs");
     }
 }

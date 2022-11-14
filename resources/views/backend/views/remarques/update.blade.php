@@ -37,7 +37,7 @@
                         <li class="breadcrumb-item">
                             <a href="{{ adminurl('remarques') }}">
                                 <i class="fa fa-file"></i>
-                                Remarque
+                                Remarques
                             </a>
                         </li>
                         <li class="breadcrumb-item active"><i class="fa fa-pencil-square"></i> {{ $title }}</li>
@@ -59,7 +59,7 @@
                             <h3><i class="fa fa-pencil-square"></i> {{ $title }} </h3>
                         </div>
                         <div class="card-body">
-                            {!! Form::model($remarque, ['route' => ['remarques.update', $remarque->id],"method"=>"patch"]) !!}
+                            {!! Form::model($remarque, ['route' => ['remarques.update', $remarque->id_remarques],"method"=>"patch"]) !!}
                             @include('backend.views.remarques.form')
                             {!! Form::close() !!}
                         </div>

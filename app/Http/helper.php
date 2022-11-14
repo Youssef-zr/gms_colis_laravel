@@ -356,12 +356,22 @@ if (!function_exists('bundel_status')) {
             'annulé' => "bg-danger",
             'retourné' => "bg-info",
         ];
-        
+
         if (in_array($status, ['livré', "en attente", "annulé", "retourné"])) {
 
             return $bundel_status[$status];
         }
 
         return "bg-secondary";
+    }
+}
+
+// user profile role
+if (!function_exists('user_profile')) {
+    function user_profile()
+    {
+        $roles = ["1" => "Admin", "2" => "Consultation", "3" => "Livreur", "4" => "Expediteur"];
+
+        return $roles;
     }
 }

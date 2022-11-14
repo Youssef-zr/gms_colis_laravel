@@ -5,7 +5,9 @@
             <div class="col-12 col-md-3">
                 <div class="form-group {{ $errors->has('date') ? 'has-error' : '' }}">
                     {!! Form::label('date', 'Date', ['class' => 'form-label']) !!}
-                    {!! Form::date('date', old('date'), ['class' => 'form-control']) !!}
+                    {!! Form::date('date', old('date', isset($paiement->date) ? date('Y-m-d', strtotime($paiement->date)) : ''), [
+                        'class' => 'form-control',
+                    ]) !!}
 
                     @if ($errors->has('date'))
                         <span class="help-block">
@@ -29,20 +31,20 @@
                 </div>
             </div>
 
-            @if (!isset($payment))
+            @if (!isset($paiement))
                 {{-- Expediteur --}}
                 <div class="col-12 col-md-3">
-                    <div class="form-group {{ $errors->has('id_expediteur') ? 'has-error' : '' }}">
-                        {!! Form::label('id_expediteur', 'Expéditeur', ['class' => 'form-label']) !!}
-                        {!! Form::select('id_expediteur', $expediteurs, old('id_expediteur'), [
+                    <div class="form-group {{ $errors->has('id_Expediteur') ? 'has-error' : '' }}">
+                        {!! Form::label('id_Expediteur', 'Expéditeur', ['class' => 'form-label']) !!}
+                        {!! Form::select('id_Expediteur', $expediteurs, old('id_Expediteur'), [
                             'class' => 'form-control',
                             'placeholder' => 'Expéditeur',
                             isset($paiement) ? 'disabled' : '',
                         ]) !!}
 
-                        @if ($errors->has('id_expediteur'))
+                        @if ($errors->has('id_Expediteur'))
                             <span class="help-block">
-                                <strong>{{ $errors->first('id_expediteur') }}</strong>
+                                <strong>{{ $errors->first('id_Expediteur') }}</strong>
                             </span>
                         @endif
                     </div>
@@ -50,24 +52,24 @@
 
                 {{-- Livreurs --}}
                 <div class="col-12 col-md-3">
-                    <div class="form-group {{ $errors->has('id_livreur') ? 'has-error' : '' }}">
-                        {!! Form::label('id_livreur', 'Livreur', ['class' => 'form-label']) !!}
-                        {!! Form::select('id_livreur', $livreurs, old('id_livreur'), [
+                    <div class="form-group {{ $errors->has('id_utilisateur') ? 'has-error' : '' }}">
+                        {!! Form::label('id_utilisateur', 'Livreur', ['class' => 'form-label']) !!}
+                        {!! Form::select('id_utilisateur', $livreurs, old('id_utilisateur'), [
                             'class' => 'form-control',
                             'placeholder' => 'Livreur',
                             isset($paiement) ? 'disabled' : '',
                         ]) !!}
 
-                        @if ($errors->has('id_livreur'))
+                        @if ($errors->has('id_utilisateur'))
                             <span class="help-block">
-                                <strong>{{ $errors->first('id_livreur') }}</strong>
+                                <strong>{{ $errors->first('id_utilisateur') }}</strong>
                             </span>
                         @endif
                     </div>
                 </div>
             @else
-                {!! Form::hidden('id_livreur', old('id_livreur'), ['id' => 'id_livreur']) !!}
-                {!! Form::hidden('id_expediteur', old('id_expediteur'), ['id' => 'id_expediteur']) !!}
+                {!! Form::hidden('id_utilisateur', old('id_utilisateur'), ['id' => 'id_utilisateur']) !!}
+                {!! Form::hidden('id_Expediteur', old('id_Expediteur'), ['id' => 'id_Expediteur']) !!}
             @endif
 
             {{-- load bundels not payed --}}
@@ -121,7 +123,7 @@
     <div class="col-12">
         <p class="mb-1">
             <strong>Montant total : </strong> <span id="total-mony">
-                {{ isset($paiement) ? $paiement->montant : '0' }} DH
+                {{ (isset($paiement) and $paiement->montant != 0) ? $paiement->montant : '0' }} DH
             </span>
             <span id="total-bundels" class="ml-3 d-inline-block">
                 <strong>Total : </strong>
@@ -149,18 +151,18 @@
                             <tr>
                                 <td>
                                     <div class="icheck-blue d-inline">
-                                        <input type="checkbox" id="{{ $colis['id'] }}"
+                                        <input type="checkbox" id="{{ $colis['id_colis'] }}"
                                             data-montant="{{ $colis['montant'] }}" class="colis_montant" name='colis[]'
-                                            value="{{ $colis['id'] }}" checked>
-                                        <label for="{{ $colis['id'] }}"></label>
+                                            value="{{ $colis['id_colis'] }}" checked>
+                                        <label class="icheck-colis" data-id="{{ $colis['id_colis'] }}"></label>
                                     </div>
                                 </td>
-                                <td>{{ $colis['numero_suivi'] }}</td>
-                                <td>{{ $colis['montant'] }}DH</td>
-                                <td>{{ $colis['date'] }}</td>
-                                <td>{{ $colis['numero_commande'] }}</td>
-                                <td>{{ $colis['code_destinataire'] }}</td>
-                                <td>{{ $colis['ville']['libelle'] }}</td>
+                                <td>{{ $colis['numero_suvi'] ?? '---' }}</td>
+                                <td>{{ $colis['montant'] != 0 ? $colis['montant'] : 0 }}DH</td>
+                                <td>{{ $colis['date'] ?? '---' }}</td>
+                                <td>{{ $colis['numero_commande'] ?? '---' }}</td>
+                                <td>{{ $colis['code_destinataire'] ?? '---' }}</td>
+                                <td>{{ $colis['ville']['libelle'] ?? '---' }}</td>
                             </tr>
                         @endforeach
                     @endif
@@ -171,50 +173,38 @@
 </div>
 {{-- end row --}}
 
-{{-- receipt --}}
-<div class="col-12" id="recu_paiment_container">
-    <div class="row">
-        <div class="col-12">
-            {{-- Expediteur --}}
-            <div class="receipt-container rounded">
-                <div class="row mb-4">
-                    @if (isset($payment) and $payment->recu_paiment != '')
-                        <div class="col-md-4 col-lg-3">
-                            <img class="img-responsive" src="{{ $payment->recu_paiment }}" alt="">
-                        </div>
-                    @endif
-                </div>
-                {{-- end row --}}
-
-                <div class="row">
-                    <div class="col-md-6 col-lg-5">
-                        <div class="form-group {{ $errors->has('recu_paiment') ? 'has-error' : '' }}">
-                            {!! Form::label('recu_paiment', 'recu paiment', ['class' => 'form-label']) !!}
-                            {!! Form::file('recu_paiment', ['class' => 'form-control']) !!}
-                            @if ($errors->has('recu_paiment'))
-                                <span class="help-block">
-                                    <strong>{{ $errors->first('recu_paiment') }}</strong>
-                                </span>
-                            @endif
-                            <small id="emailHelp" class="form-text">
-                                image de recu doit etre de type (jpg,png,jpeg,gif,svg)
-                            </small>
-                        </div>
-                    </div>
-                </div>
-                {{-- end row --}}
-            </div>
+{{-- recu --}}
+<div class="row mt-4">
+    <div class="col-md-4">
+        <div class="form-group {{ $errors->has('recu_paiment') ? 'has-error' : '' }}">
+            {!! Form::label('recu_paiment', 'recu paiment', ['class' => 'form-label']) !!}
+            {!! Form::file('recu_paiment', ['class' => 'form-control']) !!}
+            @if ($errors->has('recu_paiment'))
+                <span class="help-block">
+                    <strong>{{ $errors->first('recu_paiment') }}</strong>
+                </span>
+            @endif
+            <small id="emailHelp" class="form-text">
+                image de recu doit etre de type (jpg,png,jpeg,gif,svg)
+            </small>
         </div>
     </div>
 </div>
-
-<div class="form-group d-none" id="submit_form">
-    <button class="btn {{ isset($colis) ? 'bg-warning' : 'bg-primary' }}">
-        <i class="fa fa-floppy-o float"></i>
-        Enregistrer
-    </button>
+<div class="row">
+    <div class="col-md-6 border">
+        @php
+            $path = '';
+            if (isset($paiement)) {
+                $recu = 'assets/dist/storage/paiement/' . $paiement->ID_paiement . '.png';
+                if (\File::exists(public_path($recu))) {
+                    $path = url($recu);
+                }
+            }
+        @endphp
+        <img src="{{ $path }}" class="recu-preview" id="img-preview">
+    </div>
 </div>
-{{-- End row --}}
+{{-- end row --}}
 
 @push('js')
     <script>
@@ -238,8 +228,8 @@
 
                 // inputs data 
                 let $form = {
-                    expediteur: parseInt($('#id_expediteur').val()),
-                    livreur: parseInt($('#id_livreur').val())
+                    expediteur: parseInt($('#id_Expediteur').val()),
+                    livreur: parseInt($('#id_utilisateur').val())
                 };
 
                 if (isNaN($form.expediteur) || isNaN($form.livreur)) {
@@ -292,16 +282,16 @@
                                             <tr>
                                                 <td>
                                                     <div class="icheck-blue d-inline">
-                                                        <input type="checkbox" id="${element["id"]}" name='colis[]' value="${element["id"]}"
+                                                        <input type="checkbox" id="${element["id_colis"]}" name='colis[]' value="${element["id_colis"]}"
                                                          data-montant="${element["montant"]}" class="colis_montant">
-                                                        <label for="${element["id"]}"></label>
+                                                         <label class="icheck-colis" data-id="${element['id_colis']}"></span>
                                                     </div>
                                                 </td>
-                                                <td>${ element['numero_suivi'] }</td>
-                                                <td>${ element['montant'] }DH</td>
+                                                <td>${ element['numero_suvi'] }</td>
+                                                <td>${ element['montant']!=0 ?element['montant'] : 0 }DH</td>
                                                 <td>${ element['date'] }</td>
                                                 <td>${ element['numero_commande'] }</td>
-                                                <td>${ element['code_destinataire'] }</td>
+                                                <td>${ element['code_destinataire'] ?? '---' }</td>
                                                 <td>${ element['ville']["libelle"] }</td>
                                             </tr>
                                         `;
@@ -321,17 +311,15 @@
                         $errorField.fadeIn(500);
                         $errorField.find('p').text("données existantes")
                     }
-
                     // stoped spin icon
                     setTimeout(() => {
                         $(this).find('i').removeClass('fa-spin');
                     }, 300);
-
                 }
             });
 
             // remove data in table
-            $('#id_expediteur,#id_livreur').on('change', function() {
+            $('#id_Expediteur,#id_utilisateur').on('change', function() {
                 $table.empty();
                 oldLivreurIds = [];
                 total.bundels = 0;
@@ -368,37 +356,59 @@
                 } else {
                     totalMony.text(`${0} DH`);
                 }
-
             })
 
             // recalculate total amount
-            $totalAmount = total.mony;
+            $totalAmount = parseInt(total.mony);
 
-            $('tbody').on('change', ".colis_montant", function() {
-                $colisMontant = $(this).data('montant');
-                if ($(this).is(':checked')) {
-                    $totalAmount += $colisMontant;
-                } else {
-                    $totalAmount -= $colisMontant;
+            $('tbody').on('change', ".colis_montant", function(e) {
+                $colisMontant = parseInt($(this).data('montant'));
+                if (!isNaN($colisMontant)) {
+
+                    if ($(this).is(':checked')) {
+                        $totalAmount += parseInt($colisMontant);
+                    } else {
+                        $totalAmount -= parseInt($colisMontant);
+                    }
                 }
-
                 totalMony.text(`${$totalAmount} DH`);
             })
+
+            $('tbody').on("click", ".icheck-colis", function(e) {
+                $for = $("#" + $(this).data('id'));
+
+                if ($for.is(':checked') == true) {
+                    $for.removeAttr('checked');
+                } else {
+                    $for.attr('checked', "checked");
+                }
+                $for.change();
+            })
+
+            // preview image
+            function filePreview(input) {
+                if (input.files && input.files[0]) {
+                    var reader = new FileReader();
+                    reader.onload = function(e) {
+                        $('#img-preview').fadeIn().attr("src", e.target.result);
+                    };
+                    reader.readAsDataURL(input.files[0]);
+                }
+            }
+
+            if ($('.recu-preview').attr('src') == "") {
+                $('.recu-preview').fadeOut();
+            }
+            $('#recu_paiment').on('change', function() {
+                filePreview(this);
+            });
+
         })
     </script>
 @endpush
 
 @push('css')
     <style>
-        #recu_paiment_container {
-            position: relative;
-            transition: linear .8s all
-        }
-
-        #recu_paiment_container:hover .old-receipt-image {
-            display: block;
-        }
-
         .old-receipt-image {
             position: absolute;
             z-index: 55;
@@ -408,9 +418,9 @@
             transition: linear .8s all
         }
 
-
         .table-responsive {
-            max-height: 50vh;
+            max-height: 500px;
+            overflow-y: scroll
         }
     </style>
 @endpush

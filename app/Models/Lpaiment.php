@@ -8,16 +8,17 @@ use Illuminate\Database\Eloquent\Model;
 class Lpaiment extends Model
 {
     public $timestamps = false;
-    protected $table = "Lpaiments";
+    protected $table = "lpaiement";
     protected $guarded = [];
+    protected $primaryKey = "ID_paiement";
 
     /**
      * Get all of the comments for the Lpaiment
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function bundels()
+    public function colis()
     {
-        return $this->hasMany(Colis::class, 'id', 'id_colis');
+        return $this->hasMany(Colis::class, 'id_colis', 'id_colis');
     }
 }

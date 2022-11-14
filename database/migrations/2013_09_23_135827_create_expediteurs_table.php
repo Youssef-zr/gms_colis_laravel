@@ -21,6 +21,12 @@ class CreateExpediteursTable extends Migration
             $table->string('mail')->nullable();
             // $table->timestamps();
         });
+
+        Schema::create('remarques', function (Blueprint $table) {
+            $table->id();
+            $table->string('libelle');
+            // $table->timestamps();
+        });
     }
 
     /**
@@ -31,5 +37,6 @@ class CreateExpediteursTable extends Migration
     public function down()
     {
         Schema::dropIfExists('expediteurs');
+        Schema::dropIfExists('remarques');
     }
 }

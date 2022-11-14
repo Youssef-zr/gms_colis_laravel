@@ -59,7 +59,7 @@
                             <h4 class="mb-0"><i class="fa fa-pencil"></i> {{ $title }} </h4>
                         </div>
                         <div class="card-body">
-                            {!! Form::model($paiement, ['route' => ['paiements.update', $paiement->id], 'method' => 'patch', 'files' => true]) !!}
+                            {!! Form::model($paiement, ['route' => ['paiements.update', $paiement->ID_paiement], 'method' => 'patch', 'files' => true]) !!}
                             @include('backend.views.paiements.form')
                             {!! Form::close() !!}
                         </div>

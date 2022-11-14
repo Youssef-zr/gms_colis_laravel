@@ -145,20 +145,41 @@
 
     {{-- User role field --}}
     <div class="col-md-6 col-lg-3">
-        <div class="form-group {{ $errors->has('role') ? 'has-error' : '' }}">
+        <div class="form-group {{ $errors->has('roles_name') ? 'has-error' : '' }}">
             <div class="option">
-                {!! Form::label('role', 'le rôle d\'utilisateur', ['class' => 'form-label']) !!}
+                {!! Form::label('roles_name', 'le rôle d\'utilisateur', ['class' => 'form-label']) !!}
                 <span class="star text-danger">*</span>
             </div>
-            {!! Form::select('role', $roles, old('role'), [
+            {!! Form::select('roles_name', $roles, old('roles_name'), [
                 'class' => 'form-control',
-                'id' => 'role',
+                'id' => 'roles_name',
                 'placeholder' => 'le rôle d\'utilisateur',
             ]) !!}
 
-            @if ($errors->has('role'))
+            @if ($errors->has('roles_name'))
                 <span class="help-block">
-                    <strong>{{ $errors->first('role') }}</strong>
+                    <strong>{{ $errors->first('roles_name') }}</strong>
+                </span>
+            @endif
+        </div>
+    </div>
+</div>
+{{-- end row --}}
+
+<div class="row">
+    {{-- expediteurs field --}}
+    <div class="col-md-6">
+        <div class="form-group {{ $errors->has('id_Expediteur') ? 'has-error' : '' }}">
+            {!! Form::label('id_Expediteur', 'expediteur', ['class' => 'form-label']) !!}
+            {!! Form::select('id_Expediteur', $expediteurs, old('id_Expediteur'), [
+                'class' => 'form-control',
+                'id' => 'id_Expediteur',
+                'placeholder' => 'List Des Expediteurs',
+            ]) !!}
+
+            @if ($errors->has('id_Expediteur'))
+                <span class="help-block">
+                    <strong>{{ $errors->first('id_Expediteur') }}</strong>
                 </span>
             @endif
         </div>
@@ -175,24 +196,6 @@
 @push('js')
     <script>
         $(() => {
-            $('.show-password').click(function() {
-                let inptPassword = $(this).siblings("input");
-
-                if (inptPassword.prop('type') == "password") {
-                    inptPassword.prop('type', "text");
-                } else {
-                    inptPassword.prop('type', "password");
-                }
-
-                let iconEye = $(this).find('i');
-                iconEye.toggleClass('fa-eye fa-eye-slash');
-
-                if (iconEye.hasClass('fa-eye')) {
-                    iconEye.prop('title', "show password");
-                } else {
-                    iconEye.prop('title', "hide password");
-                }
-            });
 
             if ($("select#roles_name").val() == "client") {
                 $('#clients-list').css("display", "block");

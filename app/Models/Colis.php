@@ -14,6 +14,7 @@ class Colis extends Model
     public $timestamps = false;
     protected $table = "colis";
     protected $guarded = ["count_mony"];
+    protected $primaryKey = 'id_colis';
     /**
      * Get the user associated with the Bundel
      *
@@ -21,7 +22,7 @@ class Colis extends Model
      */
     public function expediteur()
     {
-        return $this->hasOne(Expediteur::class, 'id', 'id_expediteur');
+        return $this->hasOne(Expediteur::class, 'id_Expediteur', 'id_Expediteur');
     }
 
     /**
@@ -31,7 +32,7 @@ class Colis extends Model
      */
     public function livreur()
     {
-        return $this->hasOne(User::class, 'id', 'id_livreur');
+        return $this->hasOne(User::class, 'id', 'id_utilisateur');
     }
 
     /**
@@ -41,7 +42,7 @@ class Colis extends Model
      */
     public function ville()
     {
-        return $this->hasOne(Ville::class, 'id', 'id_ville');
+        return $this->hasOne(Ville::class, 'id_ville', 'id_ville');
     }
 
     /**
@@ -51,7 +52,7 @@ class Colis extends Model
      */
     public function statut()
     {
-        return $this->hasOne(Statut::class, 'id', 'id_statut');
+        return $this->hasOne(Statut::class, 'id_statut', 'id_statut');
     }
 
     /**
@@ -61,7 +62,7 @@ class Colis extends Model
      */
     public function remarque()
     {
-        return $this->hasOne(Remarque::class, 'id', 'id_remarques');
+        return $this->hasOne(Remarque::class, 'id_remarques', 'id_remarques');
     }
 
     public function getCountMonyAttribute()

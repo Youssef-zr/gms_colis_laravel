@@ -9,4 +9,5 @@ class Remarque extends Model
     public $timestamps = false;
     protected $table = "remarques";
     protected $guarded = [];
+    protected $primaryKey = "id_remarques";
 }

@@ -3,44 +3,18 @@
 @push('css')
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.5.1/css/buttons.dataTables.min.css" />
-
     <style>
-        div.dataTables_wrapper {
-            direction: ltr;
-        }
-
-        /* Ensure that the demo table scrolls */
-        th,
-        td {
-            white-space: nowrap;
-        }
-
-        div.dataTables_wrapper {
-            margin: 15px auto 0;
-        }
-
-        .hidden {
-            display: none
-        }
-
         .select2 {
             width: 100% !important;
         }
 
-        [class*="icheck-"]>input:first-child+input[type="hidden"]+label::before,
-        [class*="icheck-"]>input:first-child+label::before {
-            border-color: #007bff
-        }
-
-        .bundel-info-list li {
+        .colis-info-list {
             margin-bottom: 10px;
-
         }
 
-        .bundel-info-list li .label {
-            text-transform: capitalize;
+        .dataTables_scrollBody thead {
+            display: none
         }
-
     </style>
 @endpush
 
@@ -75,22 +49,21 @@
                 <div class="col-xl-12">
                     <div class="card card-primary mg-b-20">
                         <div class="card-body">
-
-                            {{-- btn length --}}
+                            <!-- btn length -->
                             <div class="datatables-length">
                                 @php
                                     $dtLimit = [25 => 25, 50 => 50, 100 => 100, 500 => 500];
                                     $currentPage = request()->page ? request()->page : 1;
                                 @endphp
                                 {!! Form::open(['url' => adminUrl('colis'), 'method' => 'get', 'id' => 'change-limit']) !!}
-                                {!! Form::hidden('page', 1,['data-total'=>$colisData->total()]) !!}
+                                {!! Form::hidden('page', 1) !!}
                                 <div class="d-flex align-items-center">
                                     Afficher {!! Form::select('limit', $dtLimit, request()->input('limit', old('limit')), ['class' => 'custom-select']) !!} entrées
                                 </div>
                                 {!! Form::close() !!}
                             </div>
 
-                            {{-- -------- btns action --}}                            
+                            <!-- -------- btns action -->
                             <div class="btn p-0" id="actions">
                                 {{-- @can('ajouter_colis') --}}
                                 <div class="btn-group">
@@ -103,7 +76,7 @@
                                     <button type="button" class="btn btn-warning btn-sm mr-1 rounded" id="search-colis">
                                         <i class="fa fa-search"></i> Rechercher
                                     </button>
-                                    {{-- @endcan --}}
+                                    {{-- @endcan  --}}
                                 </div>
                                 <div class="btn-group">
                                     <button type="button" class="btn btn-info" data-toggle="dropdown"
@@ -124,7 +97,7 @@
                                                 <i class="fa fa-history"></i> Mise en masse
                                             </button>
                                         </label>
-                                        {{-- @endcan --}}
+                                        {{-- @endcan  --}}
 
                                         <label class="dropdown-item mb-0">
                                             <button class="btn btn-danger btn-sm" id="checkall">
@@ -141,7 +114,7 @@
                                 </div>
                             </div>
 
-                            {{-- start form --}}
+                            <!-- start form -->
                             {!! Form::open(['route' => 'staff.updateDelivery', 'method' => 'patch', 'id' => 'deliveryForm']) !!}
                             <div class="modal" id="modal-default" style="overflow: hidden">
                                 <div class="d-flex align-items-center justify-content-center h-100">
@@ -161,8 +134,8 @@
                                                     {!! Form::date('date', old('date'), ['class' => 'form-control']) !!}
                                                 </div>
                                                 <div class="form-group">
-                                                    <label for="id_livreur" class="form-label">livreur</label>
-                                                    {!! Form::select('id_livreur', $livreurs, old('id_livreur'), [
+                                                    <label for="id_utilisateur" class="form-label">livreur</label>
+                                                    {!! Form::select('id_utilisateur', $livreurs, old('id_utilisateur'), [
                                                         'class' => 'form-control',
                                                         'placeholder' => 'livreurs',
                                                     ]) !!}
@@ -203,6 +176,7 @@
                                                         <th> Numéro de suivi </th>
                                                         <th> Expéditeur </th>
                                                         <th> Destinataire </th>
+                                                        <th> Tel </th>
                                                         <th> Montant </th>
                                                         <th> N°Commande </th>
                                                         <th> Livreur </th>
@@ -212,83 +186,128 @@
                                                 </thead>
                                                 <tbody>
                                                     @foreach ($colisData as $colis)
-                                                        <tr class="bundel-tr" data-id="{{ $colis->id }}">
+                                                        <tr class="bundel-tr" data-id="{{ $colis->id_colis }}">
                                                             <td>
                                                                 <div class="icheck-blue ml-2">
                                                                     <input type="checkbox" name="colis[]"
-                                                                        value="{{ $colis->id }}"
-                                                                        id="checkbox-{{ $colis->id }}">
-                                                                    <label for="checkbox-{{ $colis->id }}">
+                                                                        value="{{ $colis->id_colis }}"
+                                                                        id="checkbox-{{ $colis->id_colis }}">
+                                                                    <label for="checkbox-{{ $colis->id_colis }}">
                                                                     </label>
                                                                 </div>
                                                             </td>
-                                                            <td>{{ $colis->date ? date('d-m-Y', strtotime($colis->date)) : "---" }}</td>
-                                                            <td class="colis-get-info text-primary pointer">{{ $colis->numero_suivi }}</td>
+                                                            <td>{{ $colis->date ? date('d-m-Y', strtotime($colis->date)) : '---' }}
+                                                            </td>
+                                                            <td class="colis-get-info text-primary pointer">
+                                                                {{ $colis->numero_suvi }}</td>
                                                             <td>
-                                                                @if ($colis->expediteur->nom != null)
+                                                                @if (isset($colis->expediteur) and $colis->expediteur->nom != null)
                                                                     {{ $colis->expediteur->nom }}
                                                                 @else
                                                                     --
                                                                 @endif
                                                             </td>
-                                                            <td>{{ $colis->nom_destinataire }}</td>
+                                                            <td>
+                                                                @if ($colis->nom_destinataire != null)
+                                                                    {{ $colis->nom_destinataire }}
+                                                                @else
+                                                                    --
+                                                                @endif
+                                                            </td>
+                                                            <td>
+                                                                @if ($colis->tel != null)
+                                                                    {{ $colis->tel }}
+                                                                @else
+                                                                    --
+                                                                @endif
+                                                            </td>
                                                             <td>{{ $colis->montant }}DH</td>
                                                             <td>{{ $colis->numero_commande }}</td>
                                                             <td>
-                                                                @if (isset($colis->livreur->name))
+                                                                @if (isset($colis->livreur) and $colis->livreur->name != null)
                                                                     {{ $colis->livreur->name }}
                                                                 @else
                                                                     --
                                                                 @endif
                                                             </td>
-                                                            <td>{{ $colis->ville->libelle }}</td>
                                                             <td>
-                                                                @php
-                                                                    $status = \Str::lower($colis->statut->libelle);
-                                                                @endphp
-                                                                {{ $status }}
+                                                                @if (isset($colis->ville) and $colis->ville->libelle != null)
+                                                                    {{ $colis->ville->libelle }}
+                                                                @else
+                                                                    --
+                                                                @endif
+                                                            </td>
+                                                            <td>
+                                                                @if (isset($colis->statut->libelle) and $colis->statut->libelle != null)
+                                                                    @php
+                                                                        $statut = \Str::lower($colis->statut->libelle);
+                                                                        $color = (isset($colis->statut->color) and $colis->statut->color != '') ? $colis->statut->color : '#999';
+                                                                    @endphp
+
+                                                                    <label class="badge"
+                                                                        style="background: {{ isset($colis->statut->color) ? $colis->statut->color : '#999' }}">
+                                                                        {{ $statut }}
+                                                                    </label>
+                                                                @else
+                                                                    --
+                                                                @endif
                                                             </td>
                                                         </tr>
                                                     @endforeach
                                                 </tbody>
                                             </table>
 
-                                            {{-- pagination --}}
-                                            <div class="paginatiopn-container mt-2 d-inline-block mx-auto">
-                                                @php
-                                                    $page = isset(request()->page) ? request()->page : 1;
-                                                    $previous = $page > 1 ? $page - 1 : 1;
-                                                    $next = $page >= 1 ? $page + 1 : 1;
-                                                    
-                                                    $limit = request('limit') ?? 25;
-                                                @endphp
+                                            <!-- pagination -->
+                                            @if (!isset($searchMode))
+                                                <div class="paginatiopn-container d-inline-block mx-auto">
+                                                    @php
+                                                        $page = isset(request()->page) ? request()->page : 1;
+                                                        $previous = $page > 1 ? $page - 1 : 1;
+                                                        $next = $page >= 1 ? $page + 1 : 1;
+                                                        
+                                                        $limit = request('limit') ?? 25;
+                                                    @endphp
 
-                                                @if ($page > 1)
-                                                    <a href="{{ adminUrl("colis?page=$previous&limit=$limit") }}"
-                                                        class="btn btn-primary btn-sm mr-2"><i class="fa fa-arrow-left"></i>
-                                                        Précédent
-                                                    </a>
-                                                @endif
+                                                    @if ($page > 1)
+                                                        <a href="{{ adminUrl("colis?page=$previous&limit=$limit") }}"
+                                                            class="btn btn-primary btn-sm mr-2"><i
+                                                                class="fa fa-arrow-left"></i>
+                                                            Précédent
+                                                        </a>
+                                                    @endif
 
-                                                @if ($page >= 1 and $page < $colisData->lastPage())
-                                                    <a href="{{ adminUrl("colis?page=$next&limit=$limit") }}"
-                                                        class="btn btn-primary btn-sm"><i class="fa fa-arrow-right"></i>
-                                                        Suivant
-                                                    </a>
-                                                @endif
-                                            </div>
+                                                    @if ($page >= 1 and $page < $colisData->lastPage())
+                                                        <a href="{{ adminUrl("colis?page=$next&limit=$limit") }}"
+                                                            class="btn btn-primary btn-sm"><i
+                                                                class="fa fa-arrow-right"></i>
+                                                            Suivant
+                                                        </a>
+                                                    @endif
+                                                </div>
+                                            @endif
 
-                                            {{-- total colis --}}
+                                            <!-- total colis -->
                                             <div class="total-colis">
                                                 <ul class="list-unstyled mb-0 d-flex float-right p-0">
-                                                    <li>
-                                                        <p class="p-0 m-0">Affichage de {{ $colisData->perPage() * $page }}
-                                                            à {{ $colisData->total() + 1 }} </p>
-                                                    </li>
-                                                    <li>
-                                                        <p class="p-0 m-0 pl-1"> sur {{ $colisData->total() + 1 }} entrées
-                                                        </p>
-                                                    </li>
+                                                    @if (!isset($searchMode))
+                                                        <li>
+                                                            <p class="p-0 m-0">Affichage de
+                                                                @if ($page < $colisData->lastPage())
+                                                                    {{ $colisData->count() * $page }}
+                                                                @else
+                                                                    {{ $colisData->total() + 1 }}
+                                                                @endif
+                                                                à {{ $colisData->total() + 1 }}
+                                                            </p>
+                                                        </li>
+                                                        <li>
+                                                            <p class="p-0 m-0 pl-1"> sur {{ $colisData->total() + 1 }}
+                                                                entrées
+                                                            </p>
+                                                        </li>
+                                                    @else
+                                                        <p><b>Total:</b> {{ $colisData->count() }} Colis </p>
+                                                    @endif
                                                 </ul>
                                             </div>
                                         </div>
@@ -296,7 +315,7 @@
                                 </div>
                             </div>
                             {!! Form::close() !!}
-                            {{-- end form --}}
+                            <!-- end form -->
                         </div>
                     </div>
                 </div>
@@ -305,7 +324,7 @@
             <!-- Container closed -->
         </div>
     </div>
-    {{-- modal delete record --}}
+    <!-- modal delete record -->
 
     <!-- The Modal Remove Castumer -->
     {{-- @can('supprimer_colis') --}}
@@ -351,7 +370,7 @@
     </div>
     {{-- @endcan --}}
 
-    {{-- colis information modal --}}
+    <!-- colis information modal -->
     <div class="modal" id="showColisInfo">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
@@ -365,9 +384,9 @@
                 <!-- Modal body -->
                 <div class="modal-body">
                     <div class="row">
-                        {{-- colis information --}}
-                        <div class="col-md-6 col-lg-7">
-                            <ul class="list-unstyled bundel-info-list">
+                        <!-- colis information -->
+                        <div class="col-md-6 col-lg-5">
+                            <ul class="list-unstyled colis-info-list">
                                 <li><b class="label">date: </b> <span id="date"></span></li>
                                 <li><b class="label">numero suivi: </b> <span id="numero_suivi"></span></li>
                                 <li><b class="label">nom destinataire: </b> <span id="nom_destinataire"></span></li>
@@ -382,7 +401,7 @@
                                 <li><b class="label">statut: </b> <span id="statut"></span></li>
                                 <li><b class="label">remarques: </b> <span id="remarques"></span></li>
                             </ul>
-                            {{-- colis signature and recu --}}
+                            <!-- colis signature and recu -->
                             <div id="signature" class="d-none">
                                 <div class="form-group">
                                     <label for="signature" class="form-label d-block text-underline">Signature</label>
@@ -390,50 +409,49 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-6 col-lg-5">
+                        <div class="col-md-6 col-lg-7">
                             <div id="recu" class="d-none">
                                 <div class="form-group">
                                     <label for="recu" class="form-label d-block text-underline">Recu</label>
-                                    <img src="" alt="" class="img-responsive">
+                                    <img src="" alt="" class="img-responsive" style="height:340px">
                                 </div>
                             </div>
                         </div>
                     </div>
-
                 </div>
 
                 <!-- Modal footer -->
                 <div class="modal-footer">
                     {{-- @can('editer_colis') --}}
                     <a href="" data-url="{{ adminUrl('colis/') }}" class="btn bg-warning text-left"
-                        id="edit-bundel" title='Éditer' data-toggle="tooltip">
+                        id="edit-colis" title='Éditer' data-toggle="tooltip">
                         <i class="fa fa-edit"></i>
                         Éditer
                     </a>
-                    {{-- @endcan --}}
+                    {{-- @endcan  --}}
                     <button type="button" class="btn btn-danger hide-modal">Fermer</button>
                 </div>
             </div>
         </div>
     </div>
 
-    {{-- search colis modal --}}
+    <!-- search colis modal -->
     <div class="modal" id="searchColisModal">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
 
                 <!-- Modal Header -->
                 <div class="modal-header">
-                    <h4 class="modal-title"><i class="fa fa-search"></i> Rechercher Colis</h4>
+                    <h4 class="modal-title"><i class="fa fa-search"></i> Rechercher Paiement</h4>
                     <button type="button" class="btn btn-danger btn-sm hide-modal"><i class="fa fa-times"></i></button>
                 </div>
 
                 <!-- Modal body -->
                 {!! Form::open(['route' => 'colis.search', 'method' => 'GET']) !!}
                 <div class="modal-body">
-                    {{-- start row --}}
+                    <!-- start row -->
                     <div class="row">
-                        {{-- list status (statuts) --}}
+                        <!-- list status (statuts) -->
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label for="" class="form-label">Statuts</label>
@@ -443,32 +461,32 @@
                                 ]) !!}
                             </div>
                         </div>
-                        {{-- list (expediteurs) --}}
+                        <!-- list (expediteurs) -->
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label for="" class="form-label">Expediteurs</label>
-                                {!! Form::select('expediteur', $expediteurs, request()->input('username', old('expediteur')), [
+                                {!! Form::select('expediteur', $expediteurs, request()->input('expediteur', old('expediteur')), [
                                     'class' => 'form-control w-100',
                                     'placeholder' => 'Expediteurs',
                                 ]) !!}
                             </div>
                         </div>
-                        {{-- list (livreurs) --}}
+                        <!-- list (livreurs) -->
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label for="" class="form-label">Livreurs</label>
-                                {!! Form::select('deliveryMan', $livreurs, request()->input('deliveryMan', old('deliveryMan')), [
+                                {!! Form::select('livreur', $livreurs, request()->input('livreur', old('livreur')), [
                                     'class' => 'form-control w-100',
                                     'placeholder' => 'livreurs',
                                 ]) !!}
                             </div>
                         </div>
                     </div>
-                    {{-- end row --}}
+                    <!-- end row -->
 
-                    {{-- start row --}}
+                    <!-- start row -->
                     <div class="row">
-                        {{-- start date --}}
+                        <!-- start date -->
                         <div class="col-md-3">
                             <div class="form-group {{ $errors->has('start_date') ? 'has-error' : '' }}">
                                 <label for="" class="form-label">Date du</label>
@@ -484,7 +502,7 @@
                             </div>
                         </div>
 
-                        {{-- end date --}}
+                        <!-- end date -->
                         <div class="col-md-3">
                             <div class="form-group {{ $errors->has('end_date') ? 'has-error' : '' }}">
                                 <label for="" class="form-label">Date au</label>
@@ -500,33 +518,33 @@
                             </div>
                         </div>
 
-                        {{-- tracking number (numero suivi) --}}
+                        <!-- tracking number (numero suivi) -->
                         <div class="col-md-3">
                             <div class="form-group">
                                 <label for="" class="form-label">Numéro de suivi</label>
-                                {!! Form::text('tracking_number', request()->input('tracking_number', old('tracking_number')), [
+                                {!! Form::text('numero_suivi', request()->input('numero_suivi', old('numero_suivi')), [
                                     'class' => 'form-control',
                                     'placeholder' => 'Numéro de suivi',
                                 ]) !!}
                             </div>
                         </div>
 
-                        {{-- order number (numero de commande) --}}
+                        <!-- order number (numero de commande) -->
                         <div class="col-md-3">
                             <div class="form-group">
                                 <label for="" class="form-label">Numéro de commande</label>
-                                {!! Form::text('order_number', request()->input('order_number', old('order_number')), [
+                                {!! Form::text('numero_commande', request()->input('numero_commande', old('numero_commande')), [
                                     'class' => 'form-control',
                                     'placeholder' => 'Numéro de commande',
                                 ]) !!}
                             </div>
                         </div>
                     </div>
-                    {{-- end row --}}
+                    <!-- end row -->
 
-                    {{-- start row --}}
+                    <!-- start row -->
                     <div class="row">
-                        {{-- recipient name (nom de destinatair) --}}
+                        <!-- recipient name (nom de destinatair) -->
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label for="" class="form-label">Nom</label>
@@ -537,7 +555,7 @@
                             </div>
                         </div>
 
-                        {{-- recipient adress (adresse de destinatair) --}}
+                        <!-- recipient adress (adresse de destinatair) -->
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label for="" class="form-label">Adresse</label>
@@ -548,7 +566,7 @@
                             </div>
                         </div>
 
-                        {{-- recipient city (ville de destinatair) --}}
+                        <!-- recipient city (ville de destinatair) -->
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label for="" class="form-label">Ville</label>
@@ -559,7 +577,7 @@
                             </div>
                         </div>
                     </div>
-                    {{-- end row --}}
+                    <!-- end row -->
                 </div>
 
                 <!-- Modal footer -->
@@ -575,24 +593,23 @@
                 </div>
 
                 {!! Form::close() !!}
-                {{-- end form --}}
+                <!-- end form -->
 
             </div>
         </div>
     </div>
+
 @endsection
 
 @push('js')
     <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
-    <script type="text/javascript"
-        src="https://cdn.datatables.net/v/bs4/jszip-2.5.0/b-2.1.1/b-html5-2.1.1/datatables.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/v/bs4/jszip-2.5.0/b-2.1.1/b-html5-2.1.1/datatables.min.js"></script>
     <script src="https://cdn.datatables.net/plug-ins/1.10.15/sorting/numeric-comma.js"></script>
 
     <script>
         $(document).ready(function() {
-
             let $table = $('#example').DataTable({
                 direction: "ltr",
                 "order": [
@@ -638,6 +655,7 @@
                 "bInfo": false,
                 "lengthChange": false
             });
+
             // change style of buttons excel and pdf
             setTimeout(() => {
                 $table.buttons().container().insertBefore('#example_filter');
@@ -650,18 +668,23 @@
                     'margin-right': "20px"
                 })
                 $('#example_filter').empty();
-
                 // move actions btns to filter container
                 $('#actions').appendTo(".dt-buttons");
                 $('.buttons-pdf').appendTo("#excel")
                 $('.buttons-excel').appendTo("#pdf")
-
             }, 500);
+
+            // disbled default pagination and replace by laravel pagination ---
+            setTimeout(() => {
+                $('.total-paiements').appendTo('#example_paginate');
+                $('.datatables-length').appendTo('#example_filter');
+            }, 700);
 
             // hide modal
             $('.hide-modal').click(function() {
                 $('.modal').fadeOut();
             })
+
             // delete record
             $('.delete').click(function(e) {
                 e.preventDefault();
@@ -671,10 +694,12 @@
                 form.attr('action', form.data('url') + '/' + id);
 
             });
+
             // close modal cliking in overlay only
             $('#myModal').on('click', function(e) {
                 e.target.id == "myModal" ? $('#myModal').slideUp(500) : 'break';
             });
+
             // confirm btn submit form 
             $('.btn-confirm').click(function() {
                 $('#form-delete').submit();
@@ -705,47 +730,55 @@
                 }
             });
 
-            // get bundel ajax information
+            // get colis ajax information
             $('.colis-get-info').on('click', function() {
 
                 $('#showColisInfo').fadeIn();
 
-                $bundel_id = $(this).parent().data('id');
-                let btnEdit = $('#edit-bundel');
-                btnEdit.attr("href", btnEdit.data('url') + "/" + $bundel_id + "/edit");
+                $colis_id = $(this).parent().data('id');
+
+                let btnEdit = $('#edit-colis');
+                btnEdit.attr("href", btnEdit.data('url') + "/" + $colis_id + "/edit");
 
                 $.get({
-                    url: `/admin/colis/${$bundel_id}`,
+                    url: `/admin/colis/${$colis_id}`,
                     type: 'GET',
                     success: function(res) {
-                        let bundel = res[0];
-                        $('span#date').text(bundel.date);
-                        $('span#numero_suivi').text(bundel.numero_suivi);
-                        $('span#nom_destinataire').text(bundel.nom_destinataire);
-                        $('span#numero_commande').text(bundel.numero_commande);
-                        $('span#adresse_destinataire').text(bundel.adresse_destinataire);
-                        $('span#tel').text(bundel.tel);
-                        $('span#montant').text(bundel.montant + "DH");
-                        $('span#paye').text(bundel.paye == 0 ? "oui" : "non");
-                        $('span#expediteur').text(bundel.expediteur.nom ?? "--");
-                        $('span#ville').text(bundel.ville.libelle ?? "--");
-                        $('span#statut').text(bundel.statut.libelle ?? "--");
-                        $('span#remarques').text(bundel.remarque.libelle ?? "--");
+                        let colis = res.colis;
+                        let signature_path = res.signature;
+                        let recu_path = res.recu;
+
+                        $('span#date').text(colis.date);
+                        $('span#numero_suivi').text(colis.numero_suvi);
+                        $('span#nom_destinataire').text(colis.nom_destinataire);
+                        $('span#numero_commande').text(colis.numero_commande);
+                        $('span#adresse_destinataire').text(colis.adresse_destinataire);
+                        $('span#tel').text(colis.tel);
+                        $('span#montant').text(colis.montant + "DH");
+                        $('span#paye').text(colis.paye == 0 ? "oui" : "non");
+                        $('span#expediteur').text(colis.expediteur ? colis.expediteur.Nom :
+                            "--");
+                        $('span#ville').text(colis.ville != undefined ? colis.ville.libelle :
+                            "--");
+                        $('span#statut').text(colis.statut != undefined ? colis.statut.libelle :
+                            "--");
+                        $('span#remarques').text(colis.remarque != undefined ? colis.remarque
+                            .libelle : "--");
 
                         const url = '{{ url('') }}';
 
                         const recu = $("#recu");
-                        if (bundel.recu != null) {
+                        if (recu_path != "empty") {
                             recu.removeClass('d-none');
-                            recu.find("img").attr('src', url + "/" + bundel.recu)
+                            recu.find("img").attr('src', url + "/" + recu_path)
                         } else {
                             recu.addClass('d-none');
                         }
 
                         const signature = $("#signature");
-                        if (bundel.signature != null) {
+                        if (signature_path != "empty") {
                             signature.removeClass('d-none');
-                            signature.find("img").attr('src', url + "/" + bundel.signature)
+                            signature.find("img").attr('src', url + "/" + signature_path)
                         } else {
                             signature.addClass('d-none');
                         }

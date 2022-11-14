@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Ville extends Model
 {
     public $timestamps = false;
-    protected $table = "villes";
+    protected $table = "Ville";
     protected $guarded = [];
+    protected $primaryKey = "id_ville";
 }

@@ -1,29 +1,5 @@
 @extends('backend.layouts.master')
 
-@push('css')
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.23/css/jquery.dataTables.min.css">
-
-    <style>
-        div.dataTables_wrapper {
-            direction: ltr;
-        }
-
-        /* Ensure that the demo table scrolls */
-        th,
-        td {
-            white-space: nowrap;
-        }
-
-        div.dataTables_wrapper {
-            margin: 15px auto 0;
-        }
-
-        .hidden {
-            display: none
-        }
-    </style>
-@endpush
-
 @section('braidcrump')
     <!-- Content Header (Page header) -->
     <section class="content-header">
@@ -59,7 +35,7 @@
                             <h3><i class="fa fa-pencil-square"></i> {{ $title }} </h3>
                         </div>
                         <div class="card-body">
-                            {!! Form::model($ville, ['route' => ['villes.update', $ville->id],"method"=>"patch"]) !!}
+                            {!! Form::model($ville, ['route' => ['villes.update', $ville->id_ville],"method"=>"patch"]) !!}
                             @include('backend.views.villes.form')
                             {!! Form::close() !!}
                         </div>

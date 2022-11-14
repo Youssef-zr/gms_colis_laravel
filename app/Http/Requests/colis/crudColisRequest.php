@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests\colis;
 
+use App\Models\Colis;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class crudColisRequest extends FormRequest
 {
@@ -24,10 +26,10 @@ class crudColisRequest extends FormRequest
     public function rules()
     {
         $rules = [
-            "id_expediteur" => "sometimes|nullable",
-            "numero_commande" => "required|alpha_num|unique:colis,numero_commande",
-            "code_destinataire" => "required|string",
-            "numero_suivi" => "required|alpha_num|unique:colis,numero_suivi",
+            "id_Expediteur" => "required|nullable",
+            "numero_commande" => "required|string|unique:colis,numero_commande",
+            // "code_destinataire" => "sometimes|nullable|string",
+            "numero_suvi" => "sometimes|nullable|alpha_num|unique:colis,numero_suvi",
             "date" => "sometimes|nullable|date",
             "id_statut" => "sometimes|nullable",
             "nom_destinataire" => "required|string",
@@ -36,14 +38,15 @@ class crudColisRequest extends FormRequest
             "id_ville" => "required|nullable",
             "id_remarques" => "sometimes|nullable",
             "montant" => 'required|numeric',
-            "type_paiement" => 'required',
+            "type_paiement" => 'sometimes|nullable',
         ];
 
         $method = strtolower(request()->method());
         if ($method == "patch") {
-            $rules["numero_commande"] = "required|alpha_num|unique:colis,numero_commande," . $this->coli->id;
-            $rules["numero_suivi"] = "required|alpha_num|unique:colis,numero_suivi," . $this->coli->id;
+            $rules["numero_commande"] = ["sometimes","nullable", "string", Rule::unique("colis","numero_commande")->ignore($this->coli->id_colis,"id_colis")];
+            $rules["numero_suvi"] = ["required", "alpha_num",  Rule::unique("colis","numero_suvi")->ignore($this->coli->id_colis,"id_colis")];
         }
+
         return $rules;
     }
 }

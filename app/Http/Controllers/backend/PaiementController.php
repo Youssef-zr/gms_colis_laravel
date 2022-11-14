@@ -8,6 +8,8 @@ use App\Models\Colis;
 use App\Models\Expediteur;
 use App\Models\Lpaiment;
 use App\Models\Paiement;
+use App\Models\Statut;
+use App\Models\Ville;
 use App\Traits\UploadFiles;
 use App\User;
 use Illuminate\Http\Request;
@@ -22,14 +24,23 @@ class PaiementController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index($limit = 25, $page = 1)
     {
         $title = "paiments";
         $livreurs = User::where('status', "activé")->where('roles_name', 3)->pluck('name', "id")->toArray();
-        $expediteurs = Expediteur::where('nom', "not like", "%vide%")->pluck('nom', "id")->toArray();
-        $paiements = Paiement::select("id", "date", "montant", "id_livreur", "id_expediteur")->with('livreur:id,name', "expediteur:id,nom")->get();
+        $expediteurs = Expediteur::pluck('nom', "id_Expediteur")->toArray();
 
-        return view("backend.views.paiements.index", compact('title', 'paiements',"livreurs","expediteurs"));
+        $query = Paiement::select("ID_paiement", "date", "montant", "id_utilisateur", "id_Expediteur");
+        $query = $query->with('livreur:id,name', "expediteur:id_Expediteur,nom")->withCount("lpaiement");
+        $query = $query->orderBy('ID_paiement', "desc");
+
+        $limit = isset(request()->limit) ? request()->limit : $limit;
+        $limit = intval($limit);
+        $paiements = $query->paginate($limit);
+
+        return view("backend.views.paiements.index",
+            compact('title', 'paiements', "livreurs", "expediteurs")
+        );
     }
 
     /**
@@ -41,7 +52,7 @@ class PaiementController extends Controller
     {
         $title = "paiments";
         $livreurs = User::where('roles_name', 3)->pluck('name', "id")->toArray();
-        $expediteurs = Expediteur::where('nom', "not like", "%vide%")->pluck('nom', "id")->toArray();
+        $expediteurs = Expediteur::pluck('nom', "id_Expediteur")->toArray();
 
         return view("backend.views.paiements.create", compact('title', 'livreurs', 'expediteurs'));
     }
@@ -58,29 +69,35 @@ class PaiementController extends Controller
         $newPaiement = new Paiement();
         $newPaiement->fill($data)->save();
 
-        $file = $request->recu_paiment;
-        if ($request->hasFile("recu_paiment") and $file != null) {
-            $fileBase64 = UploadFiles::fileTo64bit($file);
-            $newPaiement->fill(['recu_paiment' => $fileBase64])->save();
-        }
-
         $totalAmount = 0;
         $colis = $request->colis;
 
-        foreach ($colis as $colis_id) {
+        if ($colis != null) {
+            foreach ($colis as $colis_id) {
 
-            $colisInfo = Colis::where('id', $colis_id)->first();
-            $colisInfo->fill(['paye' => "1", "id_statut" => 9])->save();
+                $colisInfo = Colis::where('id_colis', $colis_id)->where('id_statut', 5)->first();
+                
+                // check colis not in lpaiement
+                if ($colisInfo != null) {
+                    $colisInfo->fill(['paye' => "1", "id_statut" => 9])->save();
+                    $newLpaiement = new Lpaiment();
+                    $newLpaiement->ID_paiement = $newPaiement->ID_paiement;
+                    $newLpaiement->id_colis = $colisInfo->id_colis;
+                    $newLpaiement->save();
+                } else {
+                    $colis = Arr::except($colis, $colis_id);
+                }
 
-            $newLpaiement = new Lpaiment();
-            $newLpaiement->id_paiement = $newPaiement->id;
-            $newLpaiement->id_colis = $colisInfo->id;
-            $newLpaiement->save();
+            }
 
-            $totalAmount += intval($colisInfo->montant);
+            // calculate total amount (montant total)
+            $totalColisMontant = Colis::whereIn('id_colis', $colis)->pluck('montant')->toArray();
+            $newCollection = new Collection($totalColisMontant);
+            $totalAmount = $newCollection->sum();
+
+            // save amount
+            $newPaiement->fill(["montant" => $totalAmount])->save();
         }
-
-        $newPaiement->fill(["montant" => $totalAmount])->save();
 
         return redirect_with_flash("msgSuccess", "paiement ajouté avec succès", "paiements");
     }
@@ -104,13 +121,12 @@ class PaiementController extends Controller
      */
     public function edit(Paiement $paiement)
     {
-        $title = "editer paiment - " . $paiement->id;
+        $title = "editer paiment - " . $paiement->ID_paiement;
         $livreurs = User::where('roles_name', 3)->pluck('name', "id")->toArray();
-        $expediteurs = Expediteur::where('nom', "not like", "%vide%")->pluck('nom', "id")->toArray();
+        $expediteurs = Expediteur::pluck('nom', "id_Expediteur")->toArray();
 
-        $id_paiement = $paiement->id;
-        $LpaiementColis = Lpaiment::where('id_paiement', $id_paiement)->pluck('id_colis')->toArray();
-        $paiementColis = Colis::whereIn('id', $LpaiementColis)->get();
+        $LpaiementColis = Lpaiment::where('ID_paiement', $paiement->ID_paiement)->pluck('id_colis')->toArray();
+        $paiementColis = Colis::whereIn('id_colis', $LpaiementColis)->get();
 
         return view("backend.views.paiements.update", compact('title', "paiement", "paiementColis", "livreurs", "expediteurs"));
     }
@@ -128,43 +144,45 @@ class PaiementController extends Controller
 
         $newColis = $request->colis;
 
-        $lPayement = Lpaiment::where('id_paiement', $paiement->id)->get();
+        $lPayement = Lpaiment::where('ID_paiement', $paiement->ID_paiement)->get();
         $lPaiementsColisId = $lPayement->pluck('id_colis')->toArray();
 
         if ($lPaiementsColisId != []) {
-            $old_colis = Colis::whereIn("id", $lPaiementsColisId)->get();
+            $old_colis = Colis::whereIn("id_colis", $lPaiementsColisId)->get();
             foreach ($old_colis as $colis) {
                 $colis->fill(['paye' => 0, "id_statut" => 5])->save();
-                Lpaiment::where("id_colis", $colis->id)->first()->delete();
+                $old_lp_colis = Lpaiment::where("id_colis", $colis->id_colis)->first();
+                if ($old_lp_colis != null) {
+                    $old_lp_colis->delete();
+                }
             }
         }
 
         if ($newColis != []) {
             foreach ($newColis as $colis_id) {
                 $colis = Colis::find($colis_id);
-
                 $colis->fill(['paye' => 1, "id_statut" => 9])->save();
                 $newLpaiement = new Lpaiment();
-                $newLpaiement->id_paiement = $paiement->id;
-                $newLpaiement->id_colis = $colis->id;
+                $newLpaiement->ID_paiement = $paiement->ID_paiement;
+                $newLpaiement->id_colis = $colis->id_colis;
                 $newLpaiement->save();
             }
         }
 
         $data = Arr::except($request->all(), ['colis']);
-        $newPaiementColis = Lpaiment::where('id_paiement', $paiement->id)->pluck('id_colis')->toArray();
-        $totalColisMontant = Colis::whereIn('id', $newPaiementColis)->pluck('montant')->toArray();
+        $newPaiementColis = Lpaiment::where('ID_paiement', $paiement->ID_paiement)->pluck('id_colis')->toArray();
+        $totalColisMontant = Colis::whereIn('id_colis', $newPaiementColis)->pluck('montant')->toArray();
 
         $newCollection = new Collection($totalColisMontant);
         $data['montant'] = $newCollection->sum();
 
+        $data = Arr::except($data, ["recu_paiment"]);
+        $paiement->fill($data)->save();
+
         $file = $request->recu_paiment;
         if ($request->hasFile("recu_paiment") and $file != null) {
-            $fileBase64 = UploadFiles::fileTo64bit($file);
-            $data['recu_paiment'] = $fileBase64;
+            $this->compressedImage("recu_paiment", $paiement->ID_paiement . ".png", "assets/dist/storage/paiement");
         }
-
-        $paiement->fill($data)->save();
 
         return redirect_with_flash("msgSuccess", "paiement mis à jour avec succès", "paiements");
     }
@@ -175,13 +193,28 @@ class PaiementController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Paiement $paiement)
     {
-        //
+        $lpaiement = Lpaiment::where('ID_paiement', $paiement->ID_paiement)->get();
+        $lPaiementsColisId = $lpaiement->pluck('id_colis')->toArray();
+
+        if ($lPaiementsColisId != []) {
+            $old_colis = Colis::whereIn("id_colis", $lPaiementsColisId)->get();
+            foreach ($old_colis as $colis) {
+                $colis->fill(['paye' => 0, "id_statut" => 5])->save();
+                $old_lp_colis = Lpaiment::where("id_colis", $colis->id_colis)->first();
+                if ($old_lp_colis != null) {
+                    $old_lp_colis->delete();
+                }
+            }
+        }
+        $paiement->delete();
+
+        return redirect_with_flash("msgSuccess", "paiement supprimé avec succès", "paiements");
     }
 
     // get colis not payed for selected ( expediteur and livreur)
-    public function getBundelsNotPaid()
+    public function getColisNotPaid()
     {
         $data = request()->all();
         $expediteur = $data['expediteur'];
@@ -189,87 +222,64 @@ class PaiementController extends Controller
 
         if ($expediteur != null and $livreur != null) {
 
-            $bundels = Colis::where("id_statut", 5)
-                ->where('id_livreur', $livreur)
-                ->where('id_expediteur', $expediteur)
+            $colis = Colis::where("id_statut", 5)
+                ->where('id_utilisateur', $livreur)
+                ->where('id_Expediteur', $expediteur)
                 ->where('paye', 0)
-                ->with('ville:id,libelle')
+                ->with('ville:id_ville,libelle')
                 ->get();
 
-            return response()->json($bundels);
+            return response()->json($colis);
         }
     }
 
     // search colis
-    // public function search(Request $request)
-    // {
+    public function search(Request $request)
+    {
 
-    //     dd($request->all());
+        $query = Paiement::where('ID_paiement', "!=", 0);
 
-    //     $query = Paiement::where('id', "!=", "");
+        $numero_suivi = $request->numero_suivi;
+        if ($request->has('numero_suivi') and $numero_suivi != null) {
 
+            $colis = Colis::where('numero_suvi', "=", $numero_suivi)->first();
+            $lpaiement = Lpaiment::where('id_colis', $colis->id_colis)->first();
+            $query->where("ID_paiement", $lpaiement->ID_paiement);
+        }
 
-    //     // expediteur
-    //     if ($request->expediteur != "") {
-    //         $query->where('id_expediteur', $request->expediteur);
-    //     }
-    //     // livreur
-    //     if ($request->deliveryMan != "") {
-    //         $query->where('id_livreur', $request->deliveryMan);
-    //     }
+        // expediteur
+        if ($request->id_expediteur != "") {
+            $query->where('id_Expediteur', $request->id_expediteur);
+        }
 
-    //     // date du | date au
-    //     $from = $request->start_date;
-    //     $to = $request->end_date;
-    //     if ($from != "" and $to == "") {
-    //         $query->where('date', ">=", $from);
-    //     } else if ($from != "" and $to != "") {
-    //         $query->whereBetween('date', [$from, $to]);
-    //     } else if ($from == "" and $to != "") {
-    //         $query->where('date', "<=", $to);
-    //     }
+        // livreur
+        if ($request->id_livreur != "") {
+            $query->where('id_utilisateur', $request->id_livreur);
+        }
 
-    //     // numero suivi
-    //     if ($request->tracking_number != "") {
-    //         $query->where('numero_suivi', "like", $request->tracking_number);
-    //     }
+        // date du | date au
+        $from = $request->start_date;
+        $to = $request->end_date;
+        if ($from != "" and $to == "") {
+            $query->where('date', ">=", $from);
+        } else if ($from != "" and $to != "") {
+            $query->whereBetween('date', [$from, $to]);
+        } else if ($from == "" and $to != "") {
+            $query->where('date', "<=", $to);
+        }
 
-    //     // numero de commande
-    //     if ($request->order_number != "") {
-    //         $query->where('numero_commande', "like", $request->order_number);
-    //     }
+        $paiements = $query->with(["expediteur:id_Expediteur,nom", "livreur:id,name"])
+            ->withCount("lpaiement")->get();
 
-    //     // nom de destinataire
-    //     if ($request->name != "") {
-    //         $query->where('nom_destinataire', "like", $request->name);
-    //     }
+        $title = "resultat de la recherche";
+        $livreurs = User::where('roles_name', 3)->pluck('name', "id")->toArray();
+        $statuts = Statut::pluck('libelle', "id_statut")->toArray();
+        $expediteurs = Expediteur::pluck('nom', "id_Expediteur")->toArray();
+        $villes = Ville::pluck('libelle', "id_ville")->toArray();
 
-    //     // adresse de destinataire
-    //     if ($request->adress != "") {
-    //         $query->where('adresse_destinataire', "like", "%" . $request->adress . "%");
-    //     }
-
-    //     // adresse de destinataire
-    //     if ($request->city != "") {
-    //         $query->where('id_ville', "=", $request->city);
-    //     }
-
-    //     $title = "resultat de la recherche";
-    //     $livreurs = User::where('status', "activé")->where('roles_name', 3)->pluck('name', "id")->toArray();
-    //     $statuts = Statut::pluck('libelle', "id")->toArray();
-    //     $expediteurs = Expediteur::whereHas('colis')->pluck('nom', "id")->toArray();
-    //     $villes = Ville::pluck('libelle', "id")->toArray();
-
-    //     $segments = request()->segments();
-    //     $query = $query->with(["expediteur:id,nom", "livreur:id,name"]);
-    //     if (isset($segments[2]) and $segments[2] == "archived") {
-    //         $query->onlyTrashed();
-    //     }
-
-    //     $colisData = $query->paginate(50);
-
-    //     $searchMode = "true";
-
-    //     return view("backend.views.colis.index", compact("title", "searchMode", "colisData", "statuts", "livreurs", "expediteurs", "villes"));
-    // }
+        $searchMode = "true";
+        return view("backend.views.paiements.index",
+            compact("title", "searchMode", "paiements", "statuts", "livreurs", "expediteurs")
+        );
+    }
 }

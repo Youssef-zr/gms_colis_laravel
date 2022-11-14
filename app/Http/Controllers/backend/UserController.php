@@ -5,14 +5,13 @@ namespace App\Http\Controllers\Backend;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\users\crudUserRequest;
 use App\Http\Requests\users\EditProfileRequest;
+use App\Models\Expediteur;
 use App\Traits\UploadFiles;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
@@ -20,10 +19,10 @@ class UserController extends Controller
 
     public function __construct()
     {
-        $this->middleware('permission:liste_utilisateurs', ['only' => 'index']);
-        $this->middleware('permission:nouveau_utilisateur', ['only' => ['create', "store"]]);
-        $this->middleware('permission:editer_utilisateur', ['only' => ['edit', "update"]]);
-        $this->middleware('permission:supprimer_utilisateur', ['only' => ['destroy']]);
+        // $this->middleware('permission:liste_utilisateurs', ['only' => 'index']);
+        // $this->middleware('permission:nouveau_utilisateur', ['only' => ['create', "store"]]);
+        // $this->middleware('permission:editer_utilisateur', ['only' => ['edit', "update"]]);
+        // $this->middleware('permission:supprimer_utilisateur', ['only' => ['destroy']]);
     }
 
     /**
@@ -35,13 +34,12 @@ class UserController extends Controller
     {
         $title = "utilisateurs";
         $users = [];
-        
-        if (auth()->user()->roles[0]->name != "developpeur") {
-            $users = User::orderBy('id', 'DESC')
-                ->where("email", '!=', 'omag@dev.com')
-                ->get();
+
+        // if (auth()->user()->roles[0]->name != "developpeur") {
+        if (auth()->user()->id != 1) {
+            $users = User::where("email", '!=', 'omag@dev.com')->get();
         } else {
-            $users = User::orderBy('id', 'DESC')->get();
+            $users = User::get();
         }
 
         return view('backend.views.users.index', compact('users', "title"));
@@ -54,13 +52,10 @@ class UserController extends Controller
      */
     public function create()
     {
-        $roles = Role::pluck('name', "name")->toArray();
+        $roles = user_profile();
+        $expediteurs = Expediteur::pluck('nom', 'id_Expediteur');
 
-        if (auth()->user()->roles[0]->name != "developpeur") {
-            $roles = Arr::except($roles, "developpeur");
-        }
-
-        return view('backend.views.users.create', compact('roles'));
+        return view('backend.views.users.create', compact('roles', "expediteurs"));
     }
 
     /**
@@ -72,14 +67,15 @@ class UserController extends Controller
     public function store(crudUserRequest $request)
     {
         $input = $request->all();
+
+        $input['password_'] = $input['password'];
         $input['password'] = Hash::make($input['password']);
         $input = Arr::except($input, ['confirm-password']);
 
         $input['roles_name'] = $request->roles_name;
-        $input['IDClient'] = $request->IDClient and $request->roles_name[0] != "developpeur" ? $request->IDClient : null;
+        $input['id_Expediteur'] = (isset($request->id_Expediteur) and $request->roles_name == 4) ? $request->id_Expediteur : null;
 
-        $user = User::create($input);
-        $user->assignRole($request->input('roles_name'));
+        User::create($input);
 
         return redirect_with_flash("msgSuccess", "Utilisateur ajouté avec succès", "users");
     }
@@ -114,23 +110,18 @@ class UserController extends Controller
      */
     public function edit($id)
     {
-        $roleDev = auth()->user()->roles[0];
         $user = User::find($id);
-
-        if ($id == 1 and $roleDev->name != "developpeur") {
+        if ($user->id == 1) {
             return view('_partial.404');
         }
 
-        $roles = Role::pluck('name', 'id')->all();
-        $userRole = $user->roles[0]->id;
+        $expediteurs = Expediteur::pluck('nom', 'id_Expediteur');
 
+        $roles = user_profile();
+        $userRole = $user->roles_name;
         $user->setAttribute('role', $userRole);
 
-        if (auth()->user()->roles[0]->name != "developpeur") {
-            $roles = Arr::except($roles, "developpeur");
-        }
-
-        return view('backend.views.users.update', compact('user', 'roles', 'userRole'));
+        return view('backend.views.users.update', compact('user', 'roles', 'userRole', "expediteurs"));
     }
 
     /**
@@ -147,15 +138,15 @@ class UserController extends Controller
 
         if (!empty($input['password'])) {
             $input['password'] = Hash::make($input['password']);
+            $input['password_'] = $request->password;
         } else {
             $input = Arr::except($input, array('password'));
         }
 
+        $input['id_Expediteur'] = (isset($request->id_Expediteur) and $request->roles_name == 4) ? $request->id_Expediteur : null;
+
         $user = User::find($id);
         $user->update($input);
-
-        DB::table('model_has_roles')->where('model_id', $id)->delete();
-        $user->assignRole($request->input('role'));
 
         return redirect_with_flash("msgSuccess", "Utilisateur mis à jour avec succès", "users");
     }

@@ -39,7 +39,7 @@ trait UploadFiles
     public static function updateFile($file, $path, $oldFilePath, $default = null, $customName = null)
     {
         UploadFiles::removeFile($oldFilePath, $default);
-        
+
         return UploadFiles::storeFile($file, $path, $customName);
     }
 
@@ -87,6 +87,36 @@ trait UploadFiles
         $base64 = "data:image/" . $file_type . ";base64," . base64_encode(file_get_contents($file));
 
         return $base64;
+    }
+
+    public function compressedImage($file, $name = null, $storage)
+    {
+        if (request()->hasFile($file)) {
+
+            $_file = $_FILES[$file];
+            $conver_image = $_FILES[$file]['tmp_name'];
+
+            $extension = substr($_file['type'],6);
+
+            $image = null;
+            switch ($extension) {
+                case 'jpg':
+                case 'jpeg':
+                    $image = imagecreatefromjpeg($conver_image);
+                    break;
+                case 'gif':
+                    $image = imagecreatefromgif($conver_image);
+                    break;
+                case 'png':
+                    $image = @imagecreatefrompng($conver_image);
+                    break;
+            }
+
+            $new_conver_image = $storage . "/" . $name;
+
+            imagejpeg($image,$new_conver_image,25);
+        }
+
     }
 
 }

@@ -2,14 +2,15 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use App\Models\Colis;
+use Illuminate\Database\Eloquent\Model;
 
 class Expediteur extends Model
 {
     public $timestamps = false;
-    protected $table = "expediteurs";
+    protected $table = "Expediteur";
     protected $guarded = [];
+    protected $primaryKey = "id_Expediteur";
 
     /**
      * Get all of the bundels for the Shipper
@@ -18,6 +19,6 @@ class Expediteur extends Model
      */
     public function colis()
     {
-        return $this->hasMany(Colis::class, 'id_expediteur', 'id');
+        return $this->hasMany(Colis::class, 'id_Expediteur', 'id_Expediteur');
     }
 }

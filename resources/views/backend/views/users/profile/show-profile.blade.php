@@ -50,7 +50,7 @@
             <div class="row">
                 <div class="col-xl-12">
                     <div class="row">
-                        <div class="col-md-4 col-lg-3">
+                        <div class="col-md-4">
 
                             <!-- Profile Image -->
                             <div class="card card-primary card-outline">
@@ -62,7 +62,7 @@
 
                                     <h3 class="profile-username text-center">{{ $user->name }}</h3>
 
-                                    <p class="text-muted text-center">{{ $user->roles[0]->name }}</p>
+                                    <p class="text-muted text-center">{{ $user->roles_name }}</p>
 
                                     <ul class="list-group list-group-unbordered mb-2">
                                         <li class="list-group-item">
@@ -84,7 +84,7 @@
                             <!-- /.card -->
                         </div>
                         <!-- /.col -->
-                        <div class="col-md-8 col-lg-9">
+                        <div class="col-md-8">
                             <div class="card">
                                 <div class="card-header p-2">
                                     <ul class="nav nav-pills">

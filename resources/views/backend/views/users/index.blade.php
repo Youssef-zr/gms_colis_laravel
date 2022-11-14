@@ -4,30 +4,17 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.23/css/jquery.dataTables.min.css">
 
     <style>
-        div.dataTables_wrapper {
-            direction: ltr;
-        }
-
-        /* Ensure that the demo table scrolls */
-        th,
-        td {
-            white-space: nowrap;
-        }
-
-        div.dataTables_wrapper {
-            margin: 15px auto 0;
-        }
-
-        tbody tr td {
+        table tbody tr td {
             position: relative;
+            padding: 10px 0 !important
         }
 
         .user-photo {
-            width: 60px;
-            height: 60px;
+            width: 50px;
+            height: 50px;
             position: absolute;
-            top:3px;
-            left:20px;
+            top: 3px;
+            left: 20px;
             border-radius: 50%
         }
     </style>
@@ -59,14 +46,14 @@
 @section('content')
     <div class="box text-capitalize px-3">
 
-        @can('nouveau_utilisateur')
-            <div class="box-header mb-3 text-right">
-                <a href="{{ adminUrl('users/create') }}" class="btn btn-primary btn-sm add">
-                    <i class="fa fa-plus"></i>
-                    nouveau
-                </a>
-            </div>
-        @endcan
+        {{-- @can('nouveau_utilisateur') --}}
+        <div class="box-header mb-3 text-right">
+            <a href="{{ adminUrl('users/create') }}" class="btn btn-primary btn-sm add">
+                <i class="fa fa-plus"></i>
+                nouveau
+            </a>
+        </div>
+        {{-- @endcan --}}
         <div class="box-body">
             <!-- row -->
             <div class="row">
@@ -88,6 +75,7 @@
                                                         <th>statut</th>
                                                         <th>dernière connexion</th>
                                                         <th>rôle d'utilisateur</th>
+                                                        <th>Expediteur</th>
                                                         <th>actions</th>
                                                     </tr>
                                                 </thead>
@@ -129,47 +117,28 @@
                                                                 @endif
                                                             </td>
                                                             <td>
-                                                                @foreach ($user->roles as $role)
-                                                                    <a href="{{ adminUrl('roles/' . $role->name) }}"
-                                                                        class="badge badge-pill mr-1 {{ $role == 'developpeur' ? 'bg-maroon' : 'bg-warning' }}">
-                                                                        {{ $role->name }}
-                                                                    </a>
-                                                                @endforeach
+                                                                {{ user_profile()[$user->roles_name] }}
+                                                            </td>
+                                                            <td>
+                                                                @if ($user->expediteur !=null)
+                                                                    {{ $user->expediteur->nom }}
+                                                                @else
+                                                                    ---
+                                                                @endif
                                                             </td>
                                                             <td>
                                                                 <div class="btn-group">
-                                                                    <button type="button"
-                                                                        class="btn btn-default btn-flat">Actions</button>
-                                                                    <button type="button"
-                                                                        class="btn btn-default btn-flat dropdown-toggle dropdown-icon"
-                                                                        data-toggle="dropdown" aria-expanded="false">
-                                                                        <span class="sr-only">Toggle Dropdown</span>
-                                                                    </button>
-                                                                    <div class="dropdown-menu" role="menu"
-                                                                        style="">
-                                                                        @can('editer_utilisateur')
-                                                                            <label class="dropdown-item">
-                                                                                <a href="{{ adminurl('users/' . $user->id . '/edit') }}"
-                                                                                    class="btn btn-warning btn-block btn-flat text-left"
-                                                                                    title='editer' data-toggle="tooltip">
-                                                                                    <i class="fa fa-edit"></i>
-                                                                                    Editer
-                                                                                </a>
-                                                                            </label>
-                                                                        @endcan
-
-                                                                        @can('supprimer_utilisateur')
-                                                                            <label class="dropdown-item">
-                                                                                <a href="#"
-                                                                                    class="btn btn-danger bg-maroon btn-block btn-flat text-left delete"
-                                                                                    data-id="{{ $user->id }}"
-                                                                                    title='supprimer' data-toggle="tooltip">
-                                                                                    <i class="fa fa-trash"></i>
-                                                                                    supprimer
-                                                                                </a>
-                                                                            </label>
-                                                                        @endcan
-                                                                    </div>
+                                                                    <a href="{{ adminurl('users/' . $user->id . '/edit') }}"
+                                                                        class="btn btn-warning btn-sm text-left"
+                                                                        title='editer' data-toggle="tooltip">
+                                                                        <i class="fa fa-edit"></i>
+                                                                    </a>
+                                                                    <a href="#"
+                                                                        class="btn btn-danger bg-maroon btn-sm text-left delete"
+                                                                        data-id="{{ $user->id }}" title='supprimer'
+                                                                        data-toggle="tooltip">
+                                                                        <i class="fa fa-trash"></i>
+                                                                    </a>
                                                                 </div>
                                                             </td>
                                                         </tr>
@@ -195,51 +164,51 @@
     {{-- modal delete record --}}
 
     <!-- Modal Remove User-->
-    @can('supprimer_utilisateur')
-        <div class="modal text-left" id="myModal" style="overflow: hidden">
-            <div class="d-flex align-items-center justify-content-center h-100">
-                <div class="modal-dialog modal-md">
-                    <div class="modal-content">
-                        <!-- Modal Header -->
-                        <div class="modal-header">
-                            <h4 class="modal-title">supprimer l'utilisateur ?</h4>
-                            <button type="button" class="close hide-modal"><i class="fa fa-times-circle"></i></button>
-                        </div>
+    <div class="modal text-left" id="myModal" style="overflow: hidden">
+        <div class="d-flex align-items-center justify-content-center h-100">
+            <div class="modal-dialog modal-md">
+                <div class="modal-content">
+                    <!-- Modal Header -->
+                    <div class="modal-header">
+                        <h4 class="modal-title">supprimer l'utilisateur ?</h4>
+                        <button type="button" class="close hide-modal"><i class="fa fa-times-circle"></i></button>
+                    </div>
 
-                        <!-- Modal body -->
-                        <div class="modal-body">
-                            <h3 class="mb2 text-center" style="color:#f39c12"><i class="fa fa-exclamation-triangle fa-3x"></i>
-                            </h3>
-                            <p class="text-center">
-                                Voulez-vous supprimer cet utilisateur des enregistrements ?
-                            </p>
-                        </div>
+                    <!-- Modal body -->
+                    <div class="modal-body">
+                        <h3 class="mb2 text-center" style="color:#f39c12"><i class="fa fa-exclamation-triangle fa-3x"></i>
+                        </h3>
+                        <p class="text-center">
+                            Voulez-vous supprimer cet utilisateur des enregistrements ?
+                        </p>
+                    </div>
 
-                        <!-- Modal footer -->
-                        <div class="modal-footer" style="text-align: center !important">
-                            <form action="" data-url="{{ adminUrl('users') }}" method="post" style="display: none"
-                                id="form-delete">
-                                @csrf
-                                @method('delete')
-                            </form>
-                            <button type="button" class="btn btn-success btn-confirm btn-sm">
-                                <i class="fa fa-send"></i>
-                                Confirmer
-                            </button>
-                            <button type="button" class="btn btn-danger bg-maroon hide-modal btn-sm">
-                                <i class="fa fa-times"></i>
-                                Annuler
-                            </button>
-                        </div>
+                    <!-- Modal footer -->
+                    <div class="modal-footer" style="text-align: center !important">
+                        <form action="" data-url="{{ adminUrl('users') }}" method="post" style="display: none"
+                            id="form-delete">
+                            @csrf
+                            @method('delete')
+                        </form>
+                        <button type="button" class="btn btn-success btn-confirm btn-sm">
+                            <i class="fa fa-send"></i>
+                            Confirmer
+                        </button>
+                        <button type="button" class="btn btn-danger bg-maroon hide-modal btn-sm">
+                            <i class="fa fa-times"></i>
+                            Annuler
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
-    @endcan
+    </div>
 @endsection
 
 @push('js')
     <script src="https://cdn.datatables.net/1.10.23/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/plug-ins/1.10.15/sorting/numeric-comma.js"></script>
+
     <script>
         $(document).ready(function() {
 
@@ -249,15 +218,16 @@
                     [0, 'desc']
                 ],
                 "aLengthMenu": [
-                    [10, 25, 50, -1],
-                    [10, 25, 50, "All"]
+                    [25, 50, -1],
+                    [25, 50, "Tout"]
                 ],
                 "language": {
                     "url": "https://cdn.datatables.net/plug-ins/1.12.1/i18n/fr-FR.json"
                 },
                 "columnDefs": [{
                         "width": "60px",
-                        "targets": 0
+                        "targets": 0,
+                        "type": "numeric-comma",
                     },
                     {
                         "width": "180px",

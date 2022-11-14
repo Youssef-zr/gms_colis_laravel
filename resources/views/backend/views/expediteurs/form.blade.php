@@ -1,19 +1,19 @@
 <div class="row">
     {{-- name field --}}
     <div class="col-12 col-md-6">
-        <div class="form-group {{ $errors->has('nom') ? 'has-error' : '' }}">
+        <div class="form-group {{ $errors->has('Nom') ? 'has-error' : '' }}">
             <div class="option">
-                {!! Form::label('nom', 'Nom', ['class' => 'form-label']) !!}
+                {!! Form::label('Nom', 'Nom', ['class' => 'form-label']) !!}
                 <span class="star text-danger">*</span>
             </div>
 
-            {!! Form::text('nom', old('nom'), [
+            {!! Form::text('Nom', old('Nom'), [
                 'class' => 'form-control',
                 'placeholder' => 'Nom d\'expediteur',
             ]) !!}
-            @if ($errors->has('nom'))
+            @if ($errors->has('Nom'))
                 <span class="help-block">
-                    <strong>{{ $errors->first('nom') }}</strong>
+                    <strong>{{ $errors->first('Nom') }}</strong>
                 </span>
             @endif
         </div>

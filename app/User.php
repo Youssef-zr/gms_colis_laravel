@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Models\Expediteur;
 use App\Models\Shipper;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -9,6 +10,7 @@ use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
+    protected $table = "users";
     use Notifiable;
     use HasRoles;
     /**
@@ -60,6 +62,6 @@ class User extends Authenticatable
      */
     public function expediteur()
     {
-        return $this->hasOne(Shipper::class, 'id', 'id_expediteur');
+        return $this->hasOne(Expediteur::class, 'id_Expediteur', 'id_Expediteur');
     }
 }

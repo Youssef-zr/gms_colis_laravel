@@ -9,4 +9,5 @@ class Statut extends Model
     public $timestamps = false;
     protected $table = "statut";
     protected $guarded = [];
+    protected $primaryKey = "id_statut";
 }

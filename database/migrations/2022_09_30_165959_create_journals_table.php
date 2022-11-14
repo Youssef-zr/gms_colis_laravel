@@ -13,7 +13,7 @@ class CreateJournalsTable extends Migration
      */
     public function up()
     {
-        Schema::create('journals', function (Blueprint $table) {
+        Schema::create('journals_evenement', function (Blueprint $table) {
             $table->id();
 
             $table->unsignedBigInteger('id_utilisateur')->nullable();

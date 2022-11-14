@@ -5,6 +5,7 @@ namespace App\Http\Controllers\backend;
 use App\Http\Controllers\Controller;
 use App\Models\Ville;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class VilleController extends Controller
 {
@@ -41,7 +42,7 @@ class VilleController extends Controller
      */
     public function store(Request $request)
     {
-        $data = $this->validate($request, ['libelle' => 'required|string|max:50|unique:villes,libelle']);
+        $data = $this->validate($request, ['libelle' => 'required|string|max:50|unique:Ville,libelle']);
         $new = new Ville();
         $new->fill($data)->save();
 
@@ -81,7 +82,8 @@ class VilleController extends Controller
      */
     public function update(Request $request, Ville $ville)
     {
-        $data = $this->validate($request, ['libelle' => 'required|string|max:50|unique:villes,libelle,' . $ville->id]);
+        $rule = ["required", "string", Rule::unique("Ville", "libelle")->ignore($ville->id_ville, "id_ville")];
+        $data = $this->validate($request, ['libelle' => $rule]);
         $ville->fill($data)->save();
 
         return redirect_with_flash("msgSuccess", "ville editer avec succès", "villes");

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\backend;
 use App\Http\Controllers\Controller;
 use App\Models\Remarque;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class RemarqueController extends Controller
 {
@@ -15,10 +16,10 @@ class RemarqueController extends Controller
      */
     public function index()
     {
-        $title = "Notes";
+        $title = "Remarques";
         $remarques = Remarque::all();
 
-        return view("backend.views.remarques.index", compact("title","remarques"));
+        return view("backend.views.remarques.index", compact("title", "remarques"));
     }
 
     /**
@@ -41,8 +42,8 @@ class RemarqueController extends Controller
      */
     public function store(Request $request)
     {
-        
         $data = $this->validate($request, ['libelle' => "required|string|unique:remarques,libelle"]);
+        
         $new = new Remarque();
         $new->fill($data)->save();
 
@@ -82,7 +83,8 @@ class RemarqueController extends Controller
      */
     public function update(Request $request, Remarque $remarque)
     {
-        $data = $this->validate($request, ['libelle' => 'required|string|unique:remarques,libelle,' . $remarque->id]);
+        $rule =['required','string' , Rule::unique("remarques","libelle")->ignore($remarque->id_remarques,"id_remarques")];
+        $data = $this->validate($request, ['libelle' =>$rule]) ;
         $remarque->fill($data)->save();
 
         return redirect_with_flash("msgSuccess", "remarque mise à jour avec succès", "remarques");

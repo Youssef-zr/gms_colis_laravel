@@ -1,10 +1,9 @@
 <?php
 
 use App\Models\Colis;
-use App\Models\Lpaiment;
-use App\Models\Ville;
-use Illuminate\Support\Collection;
+use App\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -57,7 +56,7 @@ Route::group(['prefix' => "admin", "middleware" => ['auth'], 'namespace' => 'bac
 
     // colis rotes
     Route::resource('/colis', "ColisController");
-    Route::get("/search/colis","ColisController@search")->name('colis.search');
+    Route::get("/search/colis", "ColisController@search")->name('colis.search');
     Route::patch('/colisUpdateDelivery', "ColisController@updateColisDelivery")->name('staff.updateDelivery');
 
     // paiemenst routes
@@ -65,7 +64,7 @@ Route::group(['prefix' => "admin", "middleware" => ['auth'], 'namespace' => 'bac
     Route::get('/paiement/rechercher', "PaiementController@search")->name('paiements.search');
 
     // get bundels not payed for selected (expediteur and livreur)
-    Route::get('/colis-statut/paiement', "PaiementController@getBundelsNotPaid")->name('payments.colis_not_paid');
+    Route::get('/colis-statut/paiement', "PaiementController@getColisNotPaid")->name('payments.colis_not_paid');
 
     // users resource
     Route::resource('/users', "UserController");
@@ -97,29 +96,70 @@ Route::group(['prefix' => "admin", "middleware" => ['auth'], 'namespace' => 'bac
 
 // });
 
-Route::get('/test', function () {
+// Route::get('/test', function () {
 
-    $payment = Lpaiment::where('id_paiement', 2)->pluck('id_colis')->toArray();
+//     Schema::create('users', function (Blueprint $table) {
+//         $table->id();
+//         $table->string('name');
+//         $table->string('email');
+//         $table->timestamp('email_verified_at')->nullable();
+//         $table->string('password');
+//         $table->string('adress')->nullable();
+//         $table->string('phone')->nullable();
+//         $table->text('notes')->nullable()->default('---');
+//         $table->string('status')->nullable()->default('activé');
+//         $table->string('file_name', 50)->nullable()->default('default.png');
+//         $table->string('path', 100)->nullable()->default('assets/dist/storage/users/default.png');
+//         $table->dateTime('last_login_at')->nullable();
+//         $table->string('last_login_ip_address')->nullable();
 
-    $bundelsAmount = Colis::whereIn("id", $payment)->pluck('montant')->toArray();
-    $collection = new Collection($bundelsAmount);
+//         $table->integer('roles_name');
 
-    dd($collection->sum());
+//         $table->integer('id_Expediteur');
+//         // $table->unsignedBigInteger('id_expediteur')->nullable();
+//         // $table->foreign('id_expediteur')->references('id')->on('expediteurs')->onDelete('set null');
 
-    $old = [1, 5, 15, 28, 63];
-    $new = [1, 18, 15, 63, 47, 11];
+//         $table->rememberToken();
+//         $table->timestamps();
+//     });
 
-    $updatedAndRemoved = array_diff($old, $new);
-    $inserted = array_diff($new, $old);
+//     Schema::create('password_resets', function (Blueprint $table) {
+//         $table->string('email')->index();
+//         $table->string('token');
+//         $table->timestamp('created_at')->nullable();
+//     });
 
-    dd($updatedAndRemoved, $inserted);
+//     Schema::create('failed_jobs', function (Blueprint $table) {
+//         $table->id();
+//         $table->text('connection');
+//         $table->text('queue');
+//         $table->longText('payload');
+//         $table->longText('exception');
+//         $table->timestamp('failed_at')->useCurrent();
+//     });
+// });
 
-    $path = public_path("assets/dist/js/cities.json");
-    $cities = json_decode(file_get_contents($path), true);
+Route::get('/password', function () {
+    $users = User::all();
 
-    foreach ($cities['cities'] as $city) {
-        $new = new Ville();
-        $new->libelle = $city["city"];
-        $new->save();
+    $arr = [];
+    foreach ($users as $user) {
+        $password = bcrypt($user->password_);
+        array_push($arr, [$user->password_ => $password]);
+
+        $user->fill(['password' => $password])->save();
     }
+
+    dd($arr);
+});
+
+Route::get('/test/{id}', function () {
+    $colis = Colis::with(['expediteur', 'livreur', 'ville', 'statut', "remarque"])->find(1);
+
+    $signature = "";
+    $signature_path = "assets/dist/storage/colis/signature/" . $colis->id_colis . ".png";
+    if (File::isFile(public_path($signature_path))) {
+        $signature = $signature_path;
+    }
+    dd($signature, $signature_path);
 });

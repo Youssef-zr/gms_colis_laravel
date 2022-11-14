@@ -24,21 +24,10 @@
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
                 data-accordion="false">
 
-                {{-- Dashboard stats links --}}
-                @can('tableau_bord_index')
-                    <li class="nav-header">Dashboard</li>
-                    <li class="nav-item ">
-                        <a href="{{ adminUrl('stats') }}" class="nav-link {{ active_menu('stats')[1] }} ">
-                            <i class="nav-icon fa fa-dashboard"></i>
-                            <p>tableau de bord</p>
-                        </a>
-                    </li>
-                @endcan
-
                 {{-- colis links --}}
                 {{-- @can('liste_colis') --}}
                 <li class="nav-item">
-                    <a href="{{ adminUrl('colis') }}" class="nav-link {{ setActive('colis') }} ">
+                    <a href="{{ adminUrl('colis') }}" class="nav-link {{ active_menu('colis')[1] }} ">
                         <i class="fa fa-shopping-basket nav-icon"></i>
                         <p>list des colis</p>
                     </a>
@@ -47,7 +36,7 @@
 
                 {{-- @can('liste_paiments') --}}
                 <li class="nav-item">
-                    <a href="{{ adminUrl('paiements') }}" class="nav-link {{ setActive('paiements') }} ">
+                    <a href="{{ adminUrl('paiements') }}" class="nav-link {{ active_menu('paiements')[1] }} ">
                         <i class="fa fa-credit-card-alt nav-icon"></i>
                         <p>list des paiments</p>
                     </a>
@@ -67,7 +56,7 @@
                     <ul class="nav nav-treeview">
                         {{-- @can('liste_statuts') --}}
                         <li class="nav-item">
-                            <a href="{{ adminUrl('statuts') }}" class="nav-link {{ setActive('statuts') }} ">
+                            <a href="{{ adminUrl('statuts') }}" class="nav-link {{ active_menu('statut')[1] }} ">
                                 <i class="fa fa-power-off nav-icon"></i>
                                 <p>list des statuts</p>
                             </a>
@@ -76,7 +65,7 @@
 
                         {{-- @can('liste_remarque') --}}
                         <li class="nav-item">
-                            <a href="{{ adminurl('remarques') }}" class="nav-link {{ setActive('remarques') }} ">
+                            <a href="{{ adminurl('remarques') }}" class="nav-link {{ active_menu('remarques')[1] }} ">
                                 <i class="fa fa-file nav-icon"></i>
                                 <p>list des remarques</p>
                             </a>
@@ -85,7 +74,7 @@
 
                         {{-- @can('liste_villes') --}}
                         <li class="nav-item">
-                            <a href="{{ adminUrl('villes') }}" class="nav-link {{ setActive('villes') }} ">
+                            <a href="{{ adminUrl('villes') }}" class="nav-link {{ active_menu('villes')[1] }} ">
                                 <i class="fa fa-map nav-icon"></i>
                                 <p>list des villes</p>
                             </a>
@@ -94,7 +83,7 @@
 
                         {{-- @can('liste_remarques') --}}
                         <li class="nav-item">
-                            <a href="{{ adminUrl('expediteurs') }}" class="nav-link {{ setActive('expediteurs') }} ">
+                            <a href="{{ adminUrl('expediteurs') }}" class="nav-link {{ active_menu('expediteurs')[1] }} ">
                                 <i class="fa fa-users nav-icon"></i>
                                 <p>list des expediteurs</p>
                             </a>
@@ -105,7 +94,7 @@
                 {{-- @endcan --}} 
                 
                 {{-- users links --}}
-                @can('utilisateurs_inddex')
+                {{-- @can('utilisateurs_inddex') --}}
                     <li class="nav-header">Utilisateurs</li>
                     <li class="nav-item has-treeview {{ active_menu('users')[0] }}">
                         <a href="#" class="nav-link {{ active_menu('users')[1] }}">
@@ -116,7 +105,7 @@
                             </p>
                         </a>
                         <ul class="nav nav-treeview">
-                            @can('nouveau_utilisateur')
+                            {{-- @can('nouveau_utilisateur') --}}
                                 <li class="nav-item">
                                     <a href="{{ adminUrl('users/create') }}"
                                         class="nav-link {{ setActive('users/create') }} ">
@@ -124,22 +113,22 @@
                                         <p>ajouter nouveau</p>
                                     </a>
                                 </li>
-                            @endcan
+                            {{-- @endcan --}}
 
-                            @can('liste_utilisateurs')
+                            {{-- @can('liste_utilisateurs') --}}
                                 <li class="nav-item">
                                     <a href="{{ adminUrl('users') }}" class="nav-link {{ setActive('users') }} ">
                                         <i class="fa fa-circle-o nav-icon"></i>
                                         <p>liste</p>
                                     </a>
                                 </li>
-                            @endcan
+                            {{-- @endcan --}}
                         </ul>
                     </li>
-                @endcan
+                {{-- @endcan --}}
 
                 {{-- roles and permissions links --}}
-                @can('autorisations_indexd')
+                {{-- @can('autorisations_indexd') --}}
                     <li class="nav-header">Autorisations des utilisateurs</li>
                     <li
                         class="nav-item has-treeview {{ active_menu('roles')[0] || active_menu('permission')[0] ? 'menu-open' : '' }}">
@@ -151,7 +140,7 @@
                             </p>
                         </a>
                         <ul class="nav nav-treeview">
-                            @can('nouveau_rôle')
+                            {{-- @can('nouveau_rôle') --}}
                                 <li class="nav-item">
                                     <a href="{{ adminUrl('roles/create') }}"
                                         class="nav-link {{ setActive('roles/create') }} ">
@@ -159,18 +148,18 @@
                                         <p>ajouter nouveau</p>
                                     </a>
                                 </li>
-                            @endcan
+                            {{-- @endcan --}}
 
-                            @can('liste_rôles')
+                            {{-- @can('liste_rôles') --}}
                                 <li class="nav-item">
                                     <a href="{{ adminUrl('roles') }}" class="nav-link {{ setActive('roles') }} ">
                                         <i class="fa fa-circle-o nav-icon"></i>
                                         <p>liste</p>
                                     </a>
                                 </li>
-                            @endcan
+                            {{-- @endcan --}}
 
-                            @can('nouvelle_autorisation')
+                            {{-- @can('nouvelle_autorisation') --}}
                                 <li class="nav-item">
                                     <a href="{{ adminUrl('permission/create') }}"
                                         class="nav-link {{ setActive('permission/create') }} ">
@@ -178,10 +167,10 @@
                                         <p>nouvelle autorisation</p>
                                     </a>
                                 </li>
-                            @endcan
+                            {{-- @endcan --}}
                         </ul>
                     </li>
-                @endcan
+                {{-- @endcan --}}
             </ul>
         </nav>
         <!-- /.sidebar-menu -->

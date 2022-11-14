@@ -9,8 +9,9 @@ use Illuminate\Database\Eloquent\Model;
 class Paiement extends Model
 {
     public $timestamps = false;
-    protected $table = "paiments";
+    protected $table = "Paiement";
     protected $guarded = [];
+    protected $primaryKey= "ID_paiement";
 
     public function getHeureAttribute($value)
     {
@@ -24,7 +25,7 @@ class Paiement extends Model
      */
     public function livreur()
     {
-        return $this->hasOne(User::class, 'id', 'id_livreur');
+        return $this->hasOne(User::class, 'id', 'id_utilisateur');
     }
 
     /**
@@ -34,6 +35,16 @@ class Paiement extends Model
      */
     public function expediteur()
     {
-        return $this->hasOne(expediteur::class, 'id', 'id_expediteur');
+        return $this->hasOne(expediteur::class, 'id_Expediteur', 'id_Expediteur');
+    }
+
+    /**
+     * Get all of the colis for the Paiement
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function lpaiement()
+    {
+        return $this->hasMany(Lpaiment::class, 'ID_paiement', 'ID_paiement');
     }
 }

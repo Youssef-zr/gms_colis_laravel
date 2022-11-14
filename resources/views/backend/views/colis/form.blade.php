@@ -1,23 +1,23 @@
 <div class="row">
     {{-- Expediteur --}}
-    <div class="col-12 col-md-6">
-        <div class="form-group {{ $errors->has('id_expediteur') ? 'has-error' : '' }}">
-            {!! Form::label('id_expediteur', 'Expéditeur', ['class' => 'form-label']) !!}
-            {!! Form::select('id_expediteur', $expediteurs, old('id_expediteur'), [
+    <div class="col-12 col-md-4 col-lg-3">
+        <div class="form-group {{ $errors->has('id_Expediteur') ? 'has-error' : '' }}">
+            {!! Form::label('id_Expediteur', 'Expéditeur', ['class' => 'form-label']) !!}
+            {!! Form::select('id_Expediteur', $expediteurs, old('id_Expediteur'), [
                 'class' => 'form-control',
                 'placeholder' => 'Expéditeur',
             ]) !!}
 
-            @if ($errors->has('id_expediteur'))
+            @if ($errors->has('id_Expediteur'))
                 <span class="help-block">
-                    <strong>{{ $errors->first('id_expediteur') }}</strong>
+                    <strong>{{ $errors->first('id_Expediteur') }}</strong>
                 </span>
             @endif
         </div>
     </div>
 
     {{-- Numero De Commande --}}
-    <div class="col-12 col-md-6">
+    <div class="col-12 col-md-4 col-lg-3">
         <div class="form-group {{ $errors->has('numero_commande') ? 'has-error' : '' }}">
             <div class="option">
                 {!! Form::label('numero_commande', 'N° Commande', ['class' => 'form-label']) !!}
@@ -37,27 +37,27 @@
     </div>
 
     {{-- Numéro suivi --}}
-    <div class="col-12 col-md-4">
-        <div class="form-group {{ $errors->has('numero_suivi') ? 'has-error' : '' }}">
+    <div class="col-12 col-md-4 col-lg-3">
+        <div class="form-group {{ $errors->has('numero_suvi') ? 'has-error' : '' }}">
             <div class="option">
-                {!! Form::label('numero_suivi', 'Numéro suivi', ['class' => 'form-label']) !!}
+                {!! Form::label('numero_suvi', 'Numéro suivi', ['class' => 'form-label']) !!}
                 <span class="star text-danger">*</span>
             </div>
-            {!! Form::text('numero_suivi', old('numero_suivi'), [
+            {!! Form::text('numero_suvi', old('numero_suvi'), [
                 'class' => 'form-control',
                 'placeholder' => 'Numero suivi',
             ]) !!}
 
-            @if ($errors->has('numero_suivi'))
+            @if ($errors->has('numero_suvi'))
                 <span class="help-block">
-                    <strong>{{ $errors->first('numero_suivi') }}</strong>
+                    <strong>{{ $errors->first('numero_suvi') }}</strong>
                 </span>
             @endif
         </div>
     </div>
 
     {{-- Date --}}
-    <div class="col-12 col-md-4">
+    <div class="col-12 col-md-4 col-lg-3">
         <div class="form-group {{ $errors->has('date') ? 'has-error' : '' }}">
             {!! Form::label('date', 'Date', ['class' => 'form-label']) !!}
             {!! Form::date('date', old('date'), ['class' => 'form-control']) !!}
@@ -71,7 +71,7 @@
     </div>
 
     {{-- Statut --}}
-    <div class="col-12 col-md-4">
+    <div class="col-12 col-md-4 col-lg-3">
         <div class="form-group {{ $errors->has('id_statut') ? 'has-error' : '' }}">
             {!! Form::label('id_statut', 'Statut', ['class' => 'form-label']) !!}
             {!! Form::select('id_statut', $statuts, old('id_statut'), [
@@ -88,7 +88,7 @@
     </div>
 
     {{-- Code Destinataire --}}
-    <div class="col-12 col-md-4 col-lg-3">
+    {{-- <div class="col-12 col-md-4 col-lg-3">
         <div class="form-group {{ $errors->has('code_destinataire') ? 'has-error' : '' }}">
             <div class="option">
                 {!! Form::label('code_destinataire', 'Code Destinataire', ['class' => 'form-label']) !!}
@@ -105,7 +105,7 @@
                 </span>
             @endif
         </div>
-    </div>
+    </div> --}}
 
     {{-- Nom --}}
     <div class="col-12 col-md-4 col-lg-3">
@@ -165,7 +165,7 @@
     </div>
 
     {{-- Ville --}}
-    <div class="col-12 col-md-3">
+    <div class="col-12 col-md-4 col-lg-3">
         <div class="form-group {{ $errors->has('id_ville') ? 'has-error' : '' }}">
             <div class="option">
                 {!! Form::label('id_ville', 'Ville', ['class' => 'form-label']) !!}
@@ -185,7 +185,7 @@
     </div>
 
     {{-- Remarques --}}
-    <div class="col-12 col-md-3">
+    <div class="col-12 col-md-4 col-lg-3">
         <div class="form-group {{ $errors->has('id_remarques') ? 'has-error' : '' }}">
             {!! Form::label('id_remarques', 'Remarques', ['class' => 'form-label']) !!}
             {!! Form::select('id_remarques', $remarques, old('id_remarques'), [
@@ -202,7 +202,7 @@
     </div>
 
     {{-- montant --}}
-    <div class="col-12 col-md-3">
+    <div class="col-12 col-md-4 col-lg-3">
         <div class="form-group {{ $errors->has('montant') ? 'has-error' : '' }}">
             <div class="option">
                 {!! Form::label('montant', 'Montant', ['class' => 'form-label']) !!}
@@ -222,7 +222,7 @@
     </div>
 
     {{-- Type de paiement --}}
-    <div class="col-12 col-md-3">
+    <div class="col-12 col-md-4 col-lg-3">
         <div class="form-group {{ $errors->has('type_paiement') ? 'has-error' : '' }}">
             {!! Form::label('type_paiement', 'Type paiement', ['class' => 'form-label']) !!}
             {!! Form::select('type_paiement', type_paiment(), old('type_paiement'), [
@@ -243,51 +243,73 @@
 {{-- ------- sginature and recu ------- --}}
 {{-- start row --}}
 <div class="row">
-
     {{-- signature --}}
     <div class="col-12 col-md-4 col-lg-3">
-        <div class="form-group mb-1 {{ $errors->has('signed') ? 'has-error' : '' }}">
-            {!! Form::label('signed', 'signature', ['class' => 'form-label']) !!}
-            {!! Form::textarea('signed', null, ['style' => 'display: none', 'class' => 'form-control']) !!}
-            <div id="sig"></div>
+        <div class="form-group mb-1 {{ $errors->has('signature') ? 'has-error' : '' }}">
+            <div class="signature-container">
+                {!! Form::label('signature', 'signature', ['class' => 'form-label']) !!}
+                {!! Form::textarea('signature', null, ['style' => 'display: none', 'class' => 'form-control']) !!}
+                <div id="sig"></div>
 
-            @if ($errors->has('libelle'))
-                <span class="help-block">
-                    <strong>{{ $errors->first('libelle') }}</strong>
-                </span>
-            @endif
-            <button id="clear" class="btn btn-danger btn-sm ml-1">
-                <i class="fa fa-times"></i>
-                Effacer
-            </button>
+                @if ($errors->has('libelle'))
+                    <span class="help-block">
+                        <strong>{{ $errors->first('libelle') }}</strong>
+                    </span>
+                @endif
+                <button id="clear" class="btn btn-danger btn-sm ml-1">
+                    <i class="fa fa-times"></i>
+                    Effacer
+                </button>
+            </div>
         </div>
-        @if (isset($colis->signature) and $colis->signature != null)
-            <img src="{{ url($colis->signature) }}" alt="signature">
+
+        @if (isset($colis))
+            @php
+                $signature = 'assets/dist/storage/colis/signature/' . $colis->id_colis . '.png';
+            @endphp
+            @if (\File::exists(public_path($signature)))
+                <img src="{{ url($signature) }}" alt="signature">
+            @endif
         @endif
+        <button class="btn btn-success btn-sm" id="update-sign"><i class="fa fa-edit"></i> signe</button>
+
     </div>
 
     {{-- recu --}}
     <div class="col-12 col-md-4 col-lg-5">
-        <div class="form-group {{ $errors->has('receipt') ? 'has-error' : '' }}">
-            {!! Form::label('receipt', 'reçu', ['class' => 'form-label']) !!}
-            {!! Form::file('receipt', [
-                'name' => 'receipt',
+        <div class="form-group {{ $errors->has('recu') ? 'has-error' : '' }}">
+            {!! Form::label('recu', 'reçu', ['class' => 'form-label']) !!}
+            {!! Form::file('recu', [
+                'name' => 'recu',
                 'class' => 'form-control',
             ]) !!}
             <small id="emailHelp" class="form-text text-muted">
                 image de recu doit etre de type (jpg,png,jpeg,gif,svg)
             </small>
-            @if ($errors->has('receipt'))
+            @if ($errors->has('recu'))
                 <span class="help-block">
-                    <strong>{{ $errors->first('receipt') }}</strong>
+                    <strong>{{ $errors->first('recu') }}</strong>
                 </span>
             @endif
         </div>
-        @if (isset($colis->recu) and $colis->recu != null)
-            <div class="img-receipt">
-                <img src="{{ url($colis->recu) }}" class="img-responsive" alt="receipt">
-            </div>
+
+        @if (isset($colis) and $colis)
+            @php
+                $recu = 'assets/dist/storage/colis/recu/' . $colis->id_colis . '.png';
+            @endphp
+            @if (\File::exists(public_path($recu)))
+                @if (isset($recu) and $recu != null)
+                    <div class="img-recu">
+                        <img src="{{ url($recu) }}" class="img-responsive" id="recu-id" alt="recu">
+                    </div>
+                @endif
+            @else
+                <img src="" id="recu-id" alt="" class="img-responsive">
+            @endif
+        @else
+            <img src="" id="recu-id" alt="" class="img-responsive">
         @endif
+
     </div>
 </div>
 {{-- end row --}}
@@ -307,7 +329,7 @@
         $(() => {
             $.widget("ns.widget", {});
             var sig = $('#sig').signature({
-                syncField: '#signed',
+                syncField: '#signature',
                 syncFormat: 'PNG'
             });
 
@@ -326,6 +348,23 @@
                     $('.img-receipt').find('img').attr("src", URL.createObjectURL(file));
                 }
             })
+
+            // show signature form
+            $('#update-sign').on('click', function(e) {
+                e.preventDefault();
+                $('.signature-container').slideDown(500);
+                $(this).fadeOut();
+            })
+
+            // change recu image
+            $('#recu').on('change', function() {
+                let $input = $(this);
+                let reader = new FileReader();
+                reader.onload = function() {
+                    $("#recu-id").attr("src", reader.result);
+                }
+                reader.readAsDataURL($input[0].files[0]);
+            })
         })
     </script>
 @endpush
@@ -340,6 +379,14 @@
             border-color: #999;
             border-radius: 10px;
             overflow: hidden
+        }
+
+        .signature-container {
+            display: none;
+        }
+
+        #recu-id{
+            max-height: 350px
         }
     </style>
 @endpush

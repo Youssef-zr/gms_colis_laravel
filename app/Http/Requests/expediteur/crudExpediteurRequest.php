@@ -3,6 +3,7 @@
 namespace App\Http\Requests\expediteur;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class crudExpediteurRequest extends FormRequest
 {
@@ -24,15 +25,16 @@ class crudExpediteurRequest extends FormRequest
     public function rules()
     {
         $rules = [
-            'nom' => 'required|string',
-            'tel' => 'sometimes|nullable|digits:10',
+            'Nom' => 'required|string',
+            'tel' => 'sometimes|nullable|numeric|digits:10',
             'adresse' => 'sometimes|nullable|string',
             'mail' => 'required|email|unique:expediteurs,mail',
         ];
 
+    
         $method = strToLower(request()->method());
         if ($method == "patch") {
-            $rules['mail'] = 'required|email|unique:expediteurs,mail,' . $this->expediteur->id;
+            $rules['mail'] = ["required",Rule::unique('Expediteur',"mail")->ignore($this->expediteur->id_Expediteur,"id_Expediteur")];
         }
 
         return $rules;
